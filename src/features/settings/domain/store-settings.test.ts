@@ -15,6 +15,11 @@ describe("store settings parsers", () => {
     expect(parseRevenueStatuses({ statuses: ["DELIVERED", "CANCELLED"] })).toEqual([
       "DELIVERED",
     ]);
+    expect(
+      parseRevenueStatuses({
+        statuses: ["PENDING", "DELIVERED", "CANCELLED", "REFUNDED"],
+      }),
+    ).toEqual(["PENDING", "DELIVERED"]);
   });
 
   it("parses maintenance and stacking flags", () => {

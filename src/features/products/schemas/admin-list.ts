@@ -13,10 +13,16 @@ export const adminProductsPublishedFilter = [
   "unpublished",
 ] as const;
 
+/**
+ * Catalog PKs are text: UUIDv7 (admin-created) or imported marco.am CUID ids.
+ * Keep aligned with product-drawer entityIdSchema / catalogIdColumn.
+ */
+const catalogEntityIdSchema = z.string().trim().min(1).max(64);
+
 export const adminProductsFilterSchema = z.object({
   q: z.string().trim().max(100).optional(),
   sku: z.string().trim().max(64).optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryId: catalogEntityIdSchema.optional(),
   stock: z.enum(adminProductsStockFilter).default("all"),
   published: z.enum(adminProductsPublishedFilter).default("all"),
   sort: z
@@ -29,7 +35,7 @@ export const adminProductsFilterSchema = z.object({
 export type AdminProductsFilter = z.infer<typeof adminProductsFilterSchema>;
 
 export const productIdsSchema = z.object({
-  productIds: z.array(z.string().uuid()).min(1).max(50),
+  productIds: z.array(catalogEntityIdSchema).min(1).max(50),
 });
 
 export type ProductIdsInput = z.infer<typeof productIdsSchema>;
