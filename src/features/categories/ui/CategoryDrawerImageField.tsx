@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 
 import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
+import { isSvgImageSrc } from "@/features/categories/domain/header-category-icon";
 
 type CategoryDrawerImageFieldProps = {
   label: string;
@@ -12,6 +13,8 @@ type CategoryDrawerImageFieldProps = {
   removeLabel: string;
   imagePreview: string | null;
   disabled: boolean;
+  accept?: string;
+  canRemove?: boolean;
   previewClassName?: string;
   onFileChange: (file: File | null) => void;
   onRemove: () => void;
@@ -24,6 +27,8 @@ export function CategoryDrawerImageField({
   removeLabel,
   imagePreview,
   disabled,
+  accept = "image/jpeg,image/png,image/webp,image/gif",
+  canRemove = true,
   previewClassName = "mt-3 h-28 w-28 rounded-xl border border-gray-200 object-cover",
   onFileChange,
   onRemove,
@@ -45,7 +50,7 @@ export function CategoryDrawerImageField({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept={accept}
           className="hidden"
           disabled={disabled}
           onChange={(event) => {
@@ -54,7 +59,7 @@ export function CategoryDrawerImageField({
             onFileChange(file);
           }}
         />
-        {imagePreview ? (
+        {imagePreview && canRemove ? (
           <button
             type="button"
             disabled={disabled}
@@ -72,7 +77,9 @@ export function CategoryDrawerImageField({
           width={224}
           height={112}
           className={previewClassName}
-          unoptimized={imagePreview.startsWith("blob:")}
+          unoptimized={
+            imagePreview.startsWith("blob:") || isSvgImageSrc(imagePreview)
+          }
         />
       ) : null}
     </div>

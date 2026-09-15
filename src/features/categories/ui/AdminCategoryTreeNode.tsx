@@ -12,6 +12,10 @@ import {
 
 import type { AdminCategoryListItem } from "@/features/categories/application/list-admin-categories";
 import type { CategoryTreeNode } from "@/features/categories/domain/category-tree";
+import {
+  isSvgImageSrc,
+  resolveAdminCategoryIconUrl,
+} from "@/features/categories/domain/header-category-icon";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 
 type CategoriesCopy = Dictionary["admin"]["categories"];
@@ -45,6 +49,11 @@ export function AdminCategoryTreeNode({
   const hasChildren = node.children.length > 0;
   const isDragging = handlers.draggingId === node.id;
   const { copy } = handlers;
+  const iconSrc = resolveAdminCategoryIconUrl(
+    node.slug,
+    node.title,
+    node.imageUrl,
+  );
 
   return (
     <div className="space-y-2">
@@ -84,13 +93,14 @@ export function AdminCategoryTreeNode({
         </button>
 
         <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50">
-          {node.imageUrl ? (
+          {iconSrc ? (
             <Image
-              src={node.imageUrl}
+              src={iconSrc}
               alt=""
               fill
               sizes="40px"
-              className="object-cover"
+              className="object-contain p-1"
+              unoptimized={isSvgImageSrc(iconSrc)}
             />
           ) : (
             <span className="text-gray-400">—</span>

@@ -8,6 +8,7 @@ import { mediaAssets } from "@/db/schema";
 import { createId } from "@/lib/id";
 import {
   extensionForImageMime,
+  validateCategoryIconFile,
   validateImageFile,
 } from "@/lib/media/image-file";
 
@@ -59,7 +60,10 @@ async function persistCategoryMedia(
   file: File,
   role: CategoryMediaRole,
 ): Promise<{ error: string | null }> {
-  const validationError = validateImageFile(file);
+  const validationError =
+    role === CATEGORY_ICON_ROLE
+      ? validateCategoryIconFile(file)
+      : validateImageFile(file);
   if (validationError) {
     return { error: validationError };
   }

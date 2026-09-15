@@ -45,17 +45,5 @@ export const HEADER_CATEGORY_PROMO_IMAGE_WRAP_CLASS =
 export const HEADER_CATEGORY_PROMO_CONTENT_CLASS =
   "relative z-[1] flex min-w-0 flex-col items-start gap-0 sm:max-w-[58%]";
 
-export const HEADER_CATEGORY_PROMO_BADGE_CLASS =
-  "mb-3 inline-flex rounded-full bg-[rgba(71,69,48,0.18)] px-3 py-1 text-xs font-bold leading-4 text-marco-slate";
-
 export const HEADER_CATEGORY_PROMO_HEADLINE_CLASS =
-  "mb-3 text-2xl font-black leading-[1.25] tracking-tight text-marco-slate md:text-[28px] md:leading-[1.22]";
-
-export const HEADER_CATEGORY_PROMO_SUBLINE_CLASS =
-  "mb-5 text-base leading-7 text-[#334155] md:mb-6 md:text-lg md:leading-8";
-
-export const HEADER_CATEGORY_PROMO_CTA_CLASS =
-  "inline-flex w-auto max-w-full shrink-0 items-center gap-2 rounded-[68px] bg-marco-yellow py-2 pr-1.5 pl-4 text-sm font-bold text-marco-slate shadow-[0_1px_0_rgba(0,0,0,0.04)] transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marco-black/20 sm:gap-2.5 sm:pr-2 sm:pl-5 sm:text-base";
-
-export const HEADER_CATEGORY_PROMO_CTA_ICON_CLASS =
-  "flex size-9 shrink-0 items-center justify-center rounded-full bg-marco-slate text-white sm:size-10";
+  "text-2xl font-black leading-[1.25] tracking-tight text-marco-slate md:text-[28px] md:leading-[1.22]";

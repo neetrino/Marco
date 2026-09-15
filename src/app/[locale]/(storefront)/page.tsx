@@ -7,6 +7,7 @@ import { mapProductCards } from "@/features/products/map-product-cards";
 import { HomeBrands } from "@/features/home/ui/HomeBrands";
 import { HomeFeaturedProducts } from "@/features/home/ui/HomeFeaturedProducts";
 import { HomeFloorBanners } from "@/features/home/ui/HomeFloorBanners";
+import { HomeMobileCopyright } from "@/features/home/ui/HomeMobileCopyright";
 import { HomeHero } from "@/features/home/ui/HomeHero";
 import { listActiveStorefrontReels } from "@/features/reels/application/queries";
 import { HomeReels } from "@/features/reels/ui/HomeReels";
@@ -154,8 +155,11 @@ export default async function HomePage({ params }: HomePageProps) {
           promoRightAria: dictionary.home.promoRightAria,
           promoLeftCta: dictionary.home.promoLeftCta,
           promoRightCta: dictionary.home.promoRightCta,
-          neetrinoCredit: dictionary.home.neetrinoCredit,
         }}
+      />
+      <HomeMobileCopyright
+        copyrightBefore={dictionary.home.mobileCopyrightBefore}
+        creditStudio={dictionary.footer.creditStudio}
       />
     </div>
   );

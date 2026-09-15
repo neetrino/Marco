@@ -16,13 +16,14 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.tidio.co https://*.tidio.co https://*.tidiochat.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "media-src 'self' blob: https:",
-      "font-src 'self' data:",
-      "connect-src 'self' https:",
-      "frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com",
+      "font-src 'self' data: https://code.tidio.co https://*.tidio.co https://*.tidiochat.com",
+      "connect-src 'self' https: wss://*.tidio.co wss://*.tidiochat.com",
+      "worker-src 'self' blob: https://code.tidio.co https://*.tidio.co https://*.tidiochat.com",
+      "frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://code.tidio.co https://*.tidio.co https://*.tidiochat.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       // Idram GetPayment is a cross-origin HTML form POST from checkout/pay.

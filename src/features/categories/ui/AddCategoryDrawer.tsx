@@ -21,6 +21,7 @@ import {
 import { CategoryDrawerMediaFields } from "@/features/categories/ui/CategoryDrawerMediaFields";
 import { CategoryLocaleTabs } from "@/features/categories/ui/CategoryLocaleTabs";
 import { CategoryParentField } from "@/features/categories/ui/CategoryParentField";
+import { resolveAdminCategoryIconUrl } from "@/features/categories/domain/header-category-icon";
 import {
   draftsFromCategory,
   emptyCategoryDrafts,
@@ -105,7 +106,7 @@ export function AddCategoryDrawer({
       setParentId(category?.parentId ?? defaultParentId);
       setStatus(category?.status === "ARCHIVED" ? "ARCHIVED" : "ACTIVE");
       setImageFile(null);
-      setImagePreview(category?.imageUrl ?? null);
+      setImagePreview(null);
       setRemoveExistingImage(false);
       setBannerFile(null);
       setBannerPreview(category?.bannerImageUrl ?? null);
@@ -116,6 +117,17 @@ export function AddCategoryDrawer({
 
   const draft = drafts[activeLocale];
   const sharedSlug = sharedCategorySlug(drafts);
+  const uploadedIconUrl =
+    removeExistingImage || imageFile ? null : (category?.imageUrl ?? null);
+  const iconPreview = imageFile
+    ? imagePreview
+    : resolveAdminCategoryIconUrl(
+        isEdit && category ? category.slug : sharedSlug,
+        isEdit && category ? category.title : draft.title,
+        uploadedIconUrl,
+      );
+  const imageRemovable =
+    imageFile != null || Boolean(category?.imageUrl && !removeExistingImage);
   const sheetTitle = isEdit
     ? copy.drawerEdit
     : requireParent
@@ -273,8 +285,9 @@ export function AddCategoryDrawer({
             showBanner={!parentId}
             activeLocale={activeLocale}
             drawerTitle={draft.drawerTitle}
-            imagePreview={imagePreview}
+            imagePreview={iconPreview}
             bannerPreview={bannerPreview}
+            imageRemovable={imageRemovable}
             disabled={isPending}
             onDrawerTitleChange={(value) =>
               setDrafts((current) =>

@@ -6,33 +6,6 @@ export const HEADER_CATEGORY_PROMO_KEYS = [
 
 export type HeaderCategoryPromoKey = (typeof HEADER_CATEGORY_PROMO_KEYS)[number];
 
-/** Static promo visuals for known furniture/hardware roots. */
-export const HEADER_CATEGORY_PROMO_IMAGES: Record<
-  Exclude<HeaderCategoryPromoKey, "generic">,
-  string
-> = {
-  furniture: "/assets/header-category/promo-furniture.webp",
-  hardware: "/assets/header-category/promo-hardware.webp",
-};
-
-export type HeaderCategoryPromoCopy = {
-  badge: string;
-  cta: string;
-  furnitureHeadline: string;
-  furnitureSubline: string;
-  hardwareHeadline: string;
-  hardwareSubline: string;
-  genericHeadline: string;
-  genericSubline: string;
-};
-
-export type HeaderCategoryPromoText = {
-  badge: string;
-  cta: string;
-  headline: string;
-  subline: string;
-};
-
 const HARDWARE_SLUG_ALIASES = [
   "kahovyqi-patrastman-paraganer",
   "kahovyqi-patrastman-paraganer-3",
@@ -85,9 +58,8 @@ function matchesTitleAlias(
 }
 
 /**
- * Maps any root category to a promo card variant.
- * Slug aliases first, then localized title — so a junk/local slug still
- * keeps furniture/hardware fallbacks, and every other root stays generic.
+ * Maps a root category to furniture / hardware / generic.
+ * Used for catalog filters and mobile card visuals — not for drawer promo copy.
  */
 export function resolveHeaderCategoryPromo(
   slug: string,
@@ -110,45 +82,29 @@ export function resolveHeaderCategoryPromo(
   return "generic";
 }
 
-/** Resolves the promo image: admin upload first, then a known static fallback. */
+/** Admin-uploaded drawer banner only — no static furniture/hardware fallback. */
 export function headerCategoryPromoImageUrl(
-  key: HeaderCategoryPromoKey,
   uploadedUrl?: string | null,
 ): string | null {
-  if (uploadedUrl && uploadedUrl.trim() !== "") return uploadedUrl;
-  if (key === "generic") return null;
-  return HEADER_CATEGORY_PROMO_IMAGES[key];
+  const url = uploadedUrl?.trim();
+  return url ? url : null;
 }
 
-/** Picks localized headline/subline for the resolved promo card. */
-export function headerCategoryPromoText(
-  key: HeaderCategoryPromoKey,
-  copy: HeaderCategoryPromoCopy,
+/** Admin drawer title only — no static headline fallback. */
+export function headerCategoryPromoHeadline(
   drawerTitle?: string | null,
-): HeaderCategoryPromoText {
-  const override = drawerTitle?.trim() || null;
-  if (key === "hardware") {
-    return {
-      badge: copy.badge,
-      cta: copy.cta,
-      headline: override ?? copy.hardwareHeadline,
-      subline: copy.hardwareSubline,
-    };
-  }
+): string | null {
+  const title = drawerTitle?.trim();
+  return title ? title : null;
+}
 
-  if (key === "generic") {
-    return {
-      badge: copy.badge,
-      cta: copy.cta,
-      headline: override ?? copy.genericHeadline,
-      subline: copy.genericSubline,
-    };
-  }
-
-  return {
-    badge: copy.badge,
-    cta: copy.cta,
-    headline: override ?? copy.furnitureHeadline,
-    subline: copy.furnitureSubline,
-  };
+/** True when the category has admin promo content to show in the drawer. */
+export function hasHeaderCategoryPromo(
+  drawerTitle?: string | null,
+  bannerImageUrl?: string | null,
+): boolean {
+  return (
+    headerCategoryPromoHeadline(drawerTitle) != null ||
+    headerCategoryPromoImageUrl(bannerImageUrl) != null
+  );
 }

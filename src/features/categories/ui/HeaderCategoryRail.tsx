@@ -1,8 +1,8 @@
-import Image from "next/image";
-import { ChevronRight, LayoutGrid } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { memo } from "react";
 
 import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
+import { HeaderCategoryIcon } from "@/features/categories/ui/HeaderCategoryIcon";
 import {
   HEADER_CATEGORY_RAIL_PADDING_CLASS,
   HEADER_CATEGORY_RAIL_WIDTH_CLASS,
@@ -67,7 +67,12 @@ function RailRow({
       }`}
     >
       <span className="mt-1 flex size-10 shrink-0 items-center justify-center p-1 text-marco-slate">
-        <RailIcon imageUrl={category.imageUrl} />
+        <HeaderCategoryIcon
+          slug={category.slug}
+          title={category.title}
+          imageUrl={category.imageUrl}
+          size={ROOT_ICON_PX}
+        />
       </span>
       <span className="min-w-0 flex-1 pt-2 pb-1 pr-1 text-left break-words whitespace-normal [overflow-wrap:anywhere]">
         {category.title}
@@ -88,27 +93,3 @@ type RailRowProps = {
 };
 
 const MemoRailRow = memo(RailRow);
-
-function RailIcon({ imageUrl }: { imageUrl: string | null }) {
-  if (imageUrl) {
-    return (
-      <Image
-        src={imageUrl}
-        alt=""
-        width={ROOT_ICON_PX}
-        height={ROOT_ICON_PX}
-        className="h-7 w-7 shrink-0 object-contain"
-        draggable={false}
-      />
-    );
-  }
-
-  return (
-    <LayoutGrid
-      size={ROOT_ICON_PX}
-      className="shrink-0 text-marco-slate"
-      strokeWidth={1.35}
-      aria-hidden
-    />
-  );
-}
