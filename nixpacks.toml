@@ -1,0 +1,5 @@
+# Coolify/Nixpacks Docker cache mounts must be directories.
+# The Node provider otherwise mounts tsconfig.tsbuildinfo as a cache
+# target, which fails when that path is a TypeScript incremental file.
+[phases.build]
+cacheDirectories = [".next/cache", "node_modules/.cache"]
