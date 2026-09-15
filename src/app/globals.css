@@ -161,28 +161,6 @@ body {
   }
 }
 
-@keyframes neetrino-credit {
-  0%,
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.72;
-    transform: translateY(-4px);
-  }
-}
-
-.animate-neetrino-credit {
-  animation: neetrino-credit 2.4s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-neetrino-credit {
-    animation: none;
-  }
-}
-
 /* Sheets — identical duration + easing for open and close */
 @keyframes sheet-backdrop-in {
   from {
@@ -389,4 +367,11 @@ html[data-side-sheet-open] [data-side-sheet] video {
 html[data-mobile-nav-open] [data-home-reels],
 html[data-mobile-nav-open] video {
   visibility: hidden !important;
+}
+
+/* Keep the Tidio bubble above the mobile bottom nav island. */
+@media (max-width: 767px) {
+  #tidio-chat {
+    bottom: 5.5rem !important;
+  }
 }

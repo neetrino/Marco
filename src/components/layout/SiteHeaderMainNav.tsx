@@ -43,7 +43,6 @@ export function SiteHeaderMainNav({
             categoriesLabel={dictionary.nav.categories}
             closeLabel={dictionary.nav.closeMenu}
             seeAllLabel={dictionary.nav.seeAllSubcategories}
-            promoCopy={dictionary.header.categoryPromo}
             placeholder={dictionary.header.searchPlaceholder}
             submitLabel={dictionary.header.searchSubmit}
             categories={categories}

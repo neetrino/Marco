@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 
 import { SideSheet } from "@/components/ui/SideSheet";
 import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
-import type { HeaderCategoryPromoCopy } from "@/features/categories/domain/header-category-promo";
 import { HeaderCategoryContent } from "@/features/categories/ui/HeaderCategoryContent";
 import { HeaderCategoryRail } from "@/features/categories/ui/HeaderCategoryRail";
 import {
@@ -22,7 +21,6 @@ export type HeaderCategoryCopy = {
   categories: string;
   close: string;
   seeAll: string;
-  promo: HeaderCategoryPromoCopy;
 };
 
 type HeaderCategoriesDrawerProps = {
@@ -114,7 +112,6 @@ export function HeaderCategoriesDrawer({
                 selected={selected}
                 hrefFor={hrefFor}
                 seeAllLabel={copy.seeAll}
-                promoCopy={copy.promo}
                 onNavigate={() => setOpen(false)}
               />
             </div>

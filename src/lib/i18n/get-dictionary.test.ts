@@ -54,6 +54,12 @@ describe("getDictionary", () => {
     expect(getDictionary("ru").admin.nav.dashboard).toBe("Панель");
     expect(getDictionary("hy").admin.dashboard.title).toBe("Ադմին էջ");
     expect(getDictionary("ru").admin.orders.title).toBe("Заказы");
+    expect(getDictionary("hy").tidio.widgetLabel).toBe(
+      "Ինչո՞վ կարող ենք Ձեզ օգնել",
+    );
+    expect(getDictionary("ru").tidio.widgetLabel).toBe(
+      "Чем мы можем вам помочь?",
+    );
   });
 
   it("exposes storefront auth form copy", () => {

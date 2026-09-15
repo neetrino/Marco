@@ -14,6 +14,7 @@ type CategoryDrawerMediaFieldsProps = {
   drawerTitle: string;
   imagePreview: string | null;
   bannerPreview: string | null;
+  imageRemovable: boolean;
   disabled: boolean;
   onDrawerTitleChange: (value: string) => void;
   onImageFileChange: (file: File | null) => void;
@@ -29,6 +30,7 @@ export function CategoryDrawerMediaFields({
   drawerTitle,
   imagePreview,
   bannerPreview,
+  imageRemovable,
   disabled,
   onDrawerTitleChange,
   onImageFileChange,
@@ -44,7 +46,10 @@ export function CategoryDrawerMediaFields({
         changeLabel={copy.changeImage}
         removeLabel={copy.removeImage}
         imagePreview={imagePreview}
+        accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+        canRemove={imageRemovable}
         disabled={disabled}
+        previewClassName="mt-3 h-16 w-16 rounded-xl border border-gray-200 bg-gray-50 object-contain p-2"
         onFileChange={onImageFileChange}
         onRemove={onImageRemove}
       />

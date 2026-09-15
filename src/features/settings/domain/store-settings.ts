@@ -81,12 +81,19 @@ function isPositiveRateString(value: unknown): value is string {
   }
 }
 
+/** All fulfillment statuses except cancelled / refunded count toward revenue. */
 export const DEFAULT_REVENUE_STATUSES: OrderStatus[] = [
+  "PENDING",
   "CONFIRMED",
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
 ];
+
+const REVENUE_EXCLUDED_STATUSES: ReadonlySet<OrderStatus> = new Set([
+  "CANCELLED",
+  "REFUNDED",
+]);
 
 export function isStoreSettingKey(value: string): value is StoreSettingKey {
   return (STORE_SETTING_KEYS as readonly string[]).includes(value);
@@ -102,14 +109,12 @@ export function parseRevenueStatuses(value: unknown): OrderStatus[] {
     return [...DEFAULT_REVENUE_STATUSES];
   }
 
-  const parsed = statuses.filter(
-    (item): item is OrderStatus =>
-      typeof item === "string" &&
-      (ORDER_STATUSES as readonly string[]).includes(item) &&
-      item !== "CANCELLED" &&
-      item !== "REFUNDED" &&
-      item !== "PENDING",
-  );
+  const parsed = statuses.filter((item): item is OrderStatus => {
+    if (typeof item !== "string") return false;
+    if (!(ORDER_STATUSES as readonly string[]).includes(item)) return false;
+    const status = item as OrderStatus;
+    return !REVENUE_EXCLUDED_STATUSES.has(status);
+  });
 
   return parsed.length > 0 ? parsed : [...DEFAULT_REVENUE_STATUSES];
 }

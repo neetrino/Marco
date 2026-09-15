@@ -74,7 +74,7 @@ export function AdminProductsFilters({
   const hasAnythingToClear = adminProductsHasActiveFilters(filters, inputValue);
 
   return (
-    <div ref={rootRef} className="mb-6">
+    <div ref={rootRef} className="relative z-30 mb-6">
       <div className="relative">
         <div
           className={`${ADMIN_PRODUCTS_SEARCH_SHELL} ${

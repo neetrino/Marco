@@ -1,22 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  hasHeaderCategoryPromo,
+  headerCategoryPromoHeadline,
   headerCategoryPromoImageUrl,
-  headerCategoryPromoText,
   resolveHeaderCategoryPromo,
-  type HeaderCategoryPromoCopy,
 } from "@/features/categories/domain/header-category-promo";
-
-const copy: HeaderCategoryPromoCopy = {
-  badge: "Limited offer",
-  cta: "SHOP NOW",
-  furnitureHeadline: "Furniture headline",
-  furnitureSubline: "Furniture subline",
-  hardwareHeadline: "Hardware headline",
-  hardwareSubline: "Hardware subline",
-  genericHeadline: "Generic headline",
-  genericSubline: "Generic subline",
-};
 
 describe("resolveHeaderCategoryPromo", () => {
   it("maps furniture slugs", () => {
@@ -62,45 +51,30 @@ describe("resolveHeaderCategoryPromo", () => {
   });
 });
 
-describe("headerCategoryPromoText", () => {
-  it("returns furniture, hardware, or generic copy", () => {
-    expect(headerCategoryPromoText("furniture", copy).headline).toBe(
-      "Furniture headline",
-    );
-    expect(headerCategoryPromoText("hardware", copy).headline).toBe(
-      "Hardware headline",
-    );
-    expect(headerCategoryPromoText("generic", copy).headline).toBe(
-      "Generic headline",
-    );
-  });
-
-  it("prefers an admin drawer title over the static headline", () => {
-    expect(
-      headerCategoryPromoText("furniture", copy, "Custom promo").headline,
-    ).toBe("Custom promo");
-    expect(
-      headerCategoryPromoText("generic", copy, "   ").headline,
-    ).toBe("Generic headline");
+describe("headerCategoryPromoHeadline", () => {
+  it("returns only a trimmed admin drawer title", () => {
+    expect(headerCategoryPromoHeadline("Custom promo")).toBe("Custom promo");
+    expect(headerCategoryPromoHeadline("   ")).toBeNull();
+    expect(headerCategoryPromoHeadline(null)).toBeNull();
   });
 });
 
 describe("headerCategoryPromoImageUrl", () => {
-  it("returns distinct static assets for furniture and hardware", () => {
-    expect(headerCategoryPromoImageUrl("furniture")).toContain("promo-furniture");
-    expect(headerCategoryPromoImageUrl("hardware")).toContain("promo-hardware");
-    expect(headerCategoryPromoImageUrl("generic")).toBeNull();
-  });
-
-  it("prefers an admin-uploaded category banner over the static fallback", () => {
+  it("returns only an admin-uploaded banner", () => {
     expect(
-      headerCategoryPromoImageUrl("furniture", "https://cdn.example/banner.webp"),
+      headerCategoryPromoImageUrl("https://cdn.example/banner.webp"),
     ).toBe("https://cdn.example/banner.webp");
-    expect(
-      headerCategoryPromoImageUrl("generic", "https://cdn.example/tech.webp"),
-    ).toBe("https://cdn.example/tech.webp");
-    expect(headerCategoryPromoImageUrl("hardware", "   ")).toContain(
-      "promo-hardware",
+    expect(headerCategoryPromoImageUrl("   ")).toBeNull();
+    expect(headerCategoryPromoImageUrl(null)).toBeNull();
+  });
+});
+
+describe("hasHeaderCategoryPromo", () => {
+  it("is true when admin set a title or banner", () => {
+    expect(hasHeaderCategoryPromo("Promo", null)).toBe(true);
+    expect(hasHeaderCategoryPromo(null, "https://cdn.example/b.webp")).toBe(
+      true,
     );
+    expect(hasHeaderCategoryPromo("  ", null)).toBe(false);
   });
 });

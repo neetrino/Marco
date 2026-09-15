@@ -52,16 +52,6 @@
       "argavand": "Argavand",
       "yerevan": "Alek Manukyan",
       "avan": "Avan"
-    },
-    "categoryPromo": {
-      "badge": "Limited offer",
-      "cta": "SHOP NOW",
-      "furnitureHeadline": "Up to 30% off living room furniture",
-      "furnitureSubline": "Reimagine the space with our selection: quality, comfort, and modern elegance.",
-      "hardwareHeadline": "Up to 25% off furniture hardware",
-      "hardwareSubline": "Reliable details and accessories for your projects.",
-      "genericHeadline": "Special offers in this category",
-      "genericSubline": "Browse the selection and find the right option for you."
     }
   },
   "footer": {
@@ -85,5 +75,8 @@
     "paymentMethods": "Payment methods",
     "secondaryEmail": "marcogrouparmenia@mail.ru",
     "phones": ["+374 93 52 04 06", "+374 98 19 04 06", "+374 41 34 04 06"]
+  },
+  "tidio": {
+    "widgetLabel": "How can we help you?"
   }
 }

@@ -88,6 +88,7 @@ function buildDictionary(namespaces: LocaleNamespaces) {
     nav: namespaces.common.nav,
     header: namespaces.common.header,
     footer: namespaces.common.footer,
+    tidio: namespaces.common.tidio,
     home: namespaces.home,
     contact: namespaces.contact,
     deliveryReturn: namespaces.deliveryReturn,

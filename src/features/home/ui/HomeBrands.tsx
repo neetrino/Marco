@@ -65,7 +65,7 @@ export function HomeBrands({
 
   return (
     <section
-      className="bg-white pb-10 max-md:pb-0"
+      className="bg-white pb-10"
       aria-labelledby="home-brands-heading"
       style={{ marginTop: HOME_BRANDS_AFTER_PRODUCTS_GAP_PX }}
     >

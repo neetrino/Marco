@@ -4,8 +4,11 @@ import { notFound } from "next/navigation";
 import { MobileBottomNavIsland } from "@/components/layout/MobileBottomNavIsland";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { TidioChat } from "@/components/layout/TidioChat";
+import { buildTidioVisitorIdentity } from "@/components/layout/tidio-visitor";
 import { MaintenanceGate } from "@/components/layout/MaintenanceGate";
 import { shouldHideSiteHeader } from "@/components/layout/site-header-visibility";
+import { getCurrentUser } from "@/lib/auth/session";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import {
@@ -36,6 +39,8 @@ export default async function StorefrontLayout({
   );
   const pathname = (await headers()).get("x-pathname") ?? "";
   const hideHeader = shouldHideSiteHeader(pathname);
+  const user = await getCurrentUser();
+  const tidioVisitor = user ? buildTidioVisitorIdentity(user) : null;
 
   return (
     <div className="storefront-shell flex min-h-dvh flex-1 flex-col bg-white">
@@ -54,6 +59,10 @@ export default async function StorefrontLayout({
         locale={locale}
         currency={currency}
         dictionary={dictionary}
+      />
+      <TidioChat
+        widgetLabel={dictionary.tidio.widgetLabel}
+        visitor={tidioVisitor}
       />
     </div>
   );

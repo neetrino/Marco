@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import { LayoutGrid } from "lucide-react";
 import { useState } from "react";
 
 import { AppLink } from "@/components/ui/AppLink";
@@ -10,6 +8,7 @@ import {
   type HeaderCategoryGroup,
   type HeaderCategoryNode,
 } from "@/features/categories/domain/header-category-menu";
+import { HeaderCategoryIcon } from "@/features/categories/ui/HeaderCategoryIcon";
 import {
   HEADER_CATEGORY_CHILD_LINK_CLASS,
   HEADER_CATEGORY_GRID_CLASS,
@@ -77,7 +76,12 @@ function GroupParent({
         className={HEADER_CATEGORY_PARENT_LINK_CLASS}
       >
         <span className="mt-0.5 flex size-[34px] shrink-0 items-center justify-center text-marco-slate">
-          <SubIcon imageUrl={parent.imageUrl} />
+          <HeaderCategoryIcon
+            slug={parent.slug}
+            title={parent.title}
+            imageUrl={parent.imageUrl}
+            size={SUB_ICON_PX}
+          />
         </span>
         <span className="min-w-0 flex-1 text-left text-sm font-bold leading-[18px] tracking-[0.14px]">
           {parent.title}
@@ -153,26 +157,3 @@ function DescendantList({
   );
 }
 
-function SubIcon({ imageUrl }: { imageUrl: string | null }) {
-  if (imageUrl) {
-    return (
-      <Image
-        src={imageUrl}
-        alt=""
-        width={SUB_ICON_PX}
-        height={SUB_ICON_PX}
-        className="h-[26px] w-[26px] shrink-0 object-contain"
-        draggable={false}
-      />
-    );
-  }
-
-  return (
-    <LayoutGrid
-      size={SUB_ICON_PX}
-      className="shrink-0 text-marco-slate"
-      strokeWidth={1.35}
-      aria-hidden
-    />
-  );
-}
