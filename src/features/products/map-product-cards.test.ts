@@ -54,6 +54,8 @@ describe("mapProductCards", () => {
       warrantyLabels,
       new Set(),
     );
+    expect(card).toBeDefined();
+    if (!card) return;
 
     expect(card.discountPercent).toBe(20);
     expect(card.compareAtFormatted).toBe("10000 AMD");
@@ -67,6 +69,8 @@ describe("mapProductCards", () => {
       warrantyLabels,
       new Set(),
     );
+    expect(card).toBeDefined();
+    if (!card) return;
 
     expect(card.discountPercent).toBe(15);
   });
@@ -86,6 +90,8 @@ describe("mapProductCards", () => {
       warrantyLabels,
       new Set(),
     );
+    expect(card).toBeDefined();
+    if (!card) return;
 
     expect(card.priceFormatted).toBeNull();
     expect(card.compareAtFormatted).toBeNull();
