@@ -1,6 +1,12 @@
 import "server-only";
 
+import { listCatalogProductAttributeUsages } from "@/features/products/application/load-catalog-attribute-usages";
 import { getCatalogFacets } from "@/features/products/application/load-catalog-facets";
+import {
+  catalogAttributeIdByValueId,
+  collectUsedAttributeValueIds,
+  toDisplayAttributeFacets,
+} from "@/features/products/domain/catalog-attribute-facets";
 import { resolvePricePresenceForSelectedBrands } from "@/features/products/domain/catalog-brand-facet-counts";
 import {
   attributeValueIdsForColorHexes,
@@ -177,6 +183,16 @@ export async function loadStorefrontCatalog(
     currency,
     quote.rate,
   );
+  const usages = await listCatalogProductAttributeUsages(listFilter);
+  const displayFacets = toDisplayAttributeFacets(
+    facets.attributes,
+    collectUsedAttributeValueIds(
+      usages,
+      catalogAttributeIdByValueId(facets.attributes),
+      listFilter.attributeValueIdGroups ?? [],
+    ),
+    filters.attributeValueIds,
+  );
 
   let page = filters.page;
   let catalog = await getActiveProductsPage(locale, page, listFilter);
@@ -188,7 +204,11 @@ export async function loadStorefrontCatalog(
 
   return {
     filters: { ...filters, page },
-    facets,
+    facets: {
+      ...facets,
+      attributes: displayFacets.attributes,
+      colors: displayFacets.colors,
+    },
     priceBounds,
     products: catalog.products,
     total: catalog.total,

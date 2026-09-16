@@ -23,6 +23,7 @@ import {
   buildCategoryFacetsWithDistinctCounts,
   mergeCategoryFacetsByPricePresence,
 } from "@/features/products/domain/catalog-category-facet-counts";
+import { colorFacetsFromAttributes } from "@/features/products/domain/catalog-attribute-facets";
 import type {
   CatalogAttributeFacet,
   CatalogBrandFacet,
@@ -269,8 +270,6 @@ async function loadAttributeFacets(
   }
 
   const facets: CatalogAttributeFacet[] = [];
-  const colors: CatalogColorFacet[] = [];
-  const seenHex = new Set<string>();
 
   for (const row of attributeRows) {
     const translation = translationFor(row.translations, locale);
@@ -283,14 +282,9 @@ async function loadAttributeFacets(
       title: translation.title,
       values,
     });
-    for (const value of values) {
-      if (!value.colorHex || seenHex.has(value.colorHex)) continue;
-      seenHex.add(value.colorHex);
-      colors.push({ id: value.id, hex: value.colorHex });
-    }
   }
 
-  return { attributes: facets, colors };
+  return { attributes: facets, colors: colorFacetsFromAttributes(facets) };
 }
 
 async function loadPriceBounds(): Promise<{
@@ -333,7 +327,7 @@ async function loadCatalogFacets(
 }
 
 /**
- * Storefront filter facets: categories, brands, colors, and AMD price bounds.
+ * Storefront filter facets: categories, brands, attributes, colors, and AMD price bounds.
  * Category/brand counts prefer the active priced/unpriced mode; entries that
  * only exist in the other mode stay visible and switch mode on select.
  */
