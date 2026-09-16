@@ -10,6 +10,7 @@ import {
   extensionForImageMime,
   validateImageFile,
 } from "@/lib/media/image-file";
+import { putStoredObject } from "@/lib/media/put-stored-object";
 import { mediaPublicUrl } from "@/lib/media/public-url";
 
 const MAX_IMAGES = 12;
@@ -84,11 +85,14 @@ export async function persistProductMedia(
     const id = createId();
     const objectKey = `uploads/products/${input.productId}/${id}.${extensionForImageMime(file.type)}`;
     const body = Buffer.from(await file.arrayBuffer());
-    await storage.putObject({
+    const uploadError = await putStoredObject({
       objectKey,
       body,
       contentType: file.type,
     });
+    if (uploadError) {
+      return { error: uploadError };
+    }
 
     await db.insert(mediaAssets).values({
       id,

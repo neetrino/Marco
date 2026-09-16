@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 
 import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
+import { validateImageFile } from "@/lib/media/image-file";
 
 export type ProductDraftImage = {
   key: string;
@@ -27,6 +28,7 @@ export function ProductDrawerImages({
   onChange,
 }: ProductDrawerImagesProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   function setPrimary(key: string): void {
     onChange(
@@ -54,7 +56,11 @@ export function ProductDrawerImages({
     if (!fileList || fileList.length === 0) return;
     const additions: ProductDraftImage[] = [];
     for (const file of Array.from(fileList)) {
-      if (!file.type.startsWith("image/")) continue;
+      const validationError = validateImageFile(file);
+      if (validationError) {
+        setFileError(validationError);
+        return;
+      }
       additions.push({
         key: `new-${crypto.randomUUID()}`,
         previewUrl: URL.createObjectURL(file),
@@ -63,6 +69,7 @@ export function ProductDrawerImages({
       });
     }
     if (additions.length === 0) return;
+    setFileError(null);
     const merged = [...images, ...additions];
     const first = merged[0];
     if (first && !merged.some((image) => image.isPrimary)) {
@@ -99,6 +106,7 @@ export function ProductDrawerImages({
       <p className="mt-1 text-xs text-gray-500">
         Upload one or more images, then mark the main image with the checkbox.
       </p>
+      {fileError ? <p className="mt-1 text-sm text-red-700">{fileError}</p> : null}
 
       {images.length > 0 ? (
         <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

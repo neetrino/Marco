@@ -18,6 +18,14 @@ describe("validateCategoryIconFile", () => {
   });
 });
 
+describe("validateImageFile", () => {
+  it("rejects files larger than 5MB", () => {
+    expect(validateImageFile(fileOf("image/png", 5 * 1024 * 1024 + 1))).toBe(
+      "Image must be 5MB or smaller.",
+    );
+  });
+});
+
 describe("extensionForImageMime", () => {
   it("maps svg mime types", () => {
     expect(extensionForImageMime("image/svg+xml")).toBe("svg");

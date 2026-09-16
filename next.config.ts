@@ -74,13 +74,20 @@ function buildImageRemotePatterns(): NonNullable<
   return patterns;
 }
 
+/** Multipart admin uploads (images) go through middleware/proxy before Server Actions. */
+const SERVER_MUTATION_BODY_SIZE_LIMIT = "50mb";
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
   experimental: {
+    // Next.js 16 buffers middleware/proxy bodies separately from Server Actions.
+    // The default (~10MB, 1MB on some standalone hosts) drops image bytes in
+    // production while `next dev` still accepts the same FormData.
+    proxyClientMaxBodySize: SERVER_MUTATION_BODY_SIZE_LIMIT,
     serverActions: {
-      bodySizeLimit: "50mb",
+      bodySizeLimit: SERVER_MUTATION_BODY_SIZE_LIMIT,
     },
   },
   images: {
