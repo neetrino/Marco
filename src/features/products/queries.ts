@@ -240,7 +240,8 @@ function productMatchesAnyAttributeValueIds(valueIds: readonly string[]) {
   return or(onSimple, onVariant)!;
 }
 
-function catalogListWhere(filter?: CatalogListFilter) {
+/** SQL predicate for the active storefront catalog list. */
+export function catalogListWhere(filter?: CatalogListFilter) {
   const conditions = [activeCatalogWhere];
   if (filter?.q) {
     conditions.push(catalogTextSearchWhere(filter.q));
@@ -289,7 +290,8 @@ function catalogListWhere(filter?: CatalogListFilter) {
   return and(...conditions);
 }
 
-function catalogFilterCacheKey(filter?: CatalogListFilter): string {
+/** Stable cache key for catalog list filters. */
+export function catalogFilterCacheKey(filter?: CatalogListFilter): string {
   if (!filter) return "";
   const categoryKey = [...(filter.categoryIds ?? [])].sort().join(",");
   const brandKey = [...(filter.brandIds ?? [])].sort().join(",");

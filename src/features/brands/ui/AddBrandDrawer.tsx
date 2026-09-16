@@ -16,6 +16,7 @@ import {
 } from "@/features/brands/actions";
 import type { AdminBrandListItem } from "@/features/brands/application/list-admin-brands";
 import { generateBrandSku } from "@/features/brands/domain/brand-identity";
+import { validateImageFile } from "@/lib/media/image-file";
 
 type AddBrandDrawerProps = {
   locale: string;
@@ -130,6 +131,14 @@ export function AddBrandDrawer({
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
                   event.target.value = "";
+                  if (file) {
+                    const validationError = validateImageFile(file);
+                    if (validationError) {
+                      setError(validationError);
+                      return;
+                    }
+                  }
+                  setError(null);
                   setImagePreview((current) => {
                     if (current?.startsWith("blob:")) {
                       URL.revokeObjectURL(current);

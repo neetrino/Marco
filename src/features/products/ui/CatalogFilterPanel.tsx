@@ -1,5 +1,6 @@
 "use client";
 
+import { catalogNonColorAttributeFacets } from "@/features/products/domain/catalog-attribute-facets";
 import { findBrandFacetBySlug } from "@/features/products/domain/catalog-brand-facet-counts";
 import { findCategoryFacetBySlug } from "@/features/products/domain/catalog-category-facet-counts";
 import type { CatalogFacets } from "@/features/products/domain/catalog-filters";
@@ -11,6 +12,7 @@ import {
 } from "@/features/products/domain/catalog-href";
 import { normalizeSelectedPriceRange } from "@/features/products/domain/catalog-price-bounds";
 import type { CatalogSearchParams } from "@/features/products/domain/catalog-search-params";
+import { CatalogAttributeFilter } from "@/features/products/ui/CatalogAttributeFilter";
 import { CatalogBrandFilter } from "@/features/products/ui/CatalogBrandFilter";
 import { CatalogCategoryFilter } from "@/features/products/ui/CatalogCategoryFilter";
 import { CatalogColorFilter } from "@/features/products/ui/CatalogColorFilter";
@@ -51,9 +53,10 @@ export function CatalogFilterPanel({
 }: CatalogFilterPanelProps) {
   const selectedCategories = new Set(filters.categorySlugs);
   const selectedBrands = new Set(filters.brandSlugs);
-  const selectedColors = new Set(filters.attributeValueIds);
+  const selectedAttributeValues = new Set(filters.attributeValueIds);
   const selectedMin = filters.minPrice ?? priceBounds?.minMajor ?? 0;
   const selectedMax = filters.maxPrice ?? priceBounds?.maxMajor ?? 0;
+  const textAttributes = catalogNonColorAttributeFacets(facets.attributes);
 
   return (
     <div className="flex flex-col">
@@ -115,7 +118,7 @@ export function CatalogFilterPanel({
           <h2 className={CATALOG_FILTER_TITLE}>{copy.colors}</h2>
           <CatalogColorFilter
             colors={facets.colors}
-            selectedIds={selectedColors}
+            selectedIds={selectedAttributeValues}
             label={copy.colors}
             onToggle={(valueId) =>
               onFiltersChange(withToggledAttributeValue(filters, valueId))
@@ -123,6 +126,18 @@ export function CatalogFilterPanel({
           />
         </section>
       ) : null}
+      {textAttributes.map((attribute) => (
+        <section key={attribute.id} className={CATALOG_FILTER_SECTION}>
+          <h2 className={CATALOG_FILTER_TITLE}>{attribute.title}</h2>
+          <CatalogAttributeFilter
+            attribute={attribute}
+            selectedIds={selectedAttributeValues}
+            onToggle={(valueId) =>
+              onFiltersChange(withToggledAttributeValue(filters, valueId))
+            }
+          />
+        </section>
+      ))}
     </div>
   );
 }

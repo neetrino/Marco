@@ -10,6 +10,7 @@ import {
   extensionForImageMime,
   validateImageFile,
 } from "@/lib/media/image-file";
+import { putStoredObject } from "@/lib/media/put-stored-object";
 
 /** Saves a single primary image for a brand via object storage. */
 export async function persistBrandImage(
@@ -28,20 +29,23 @@ export async function persistBrandImage(
     .from(mediaAssets)
     .where(eq(mediaAssets.brandId, brandId));
 
+  const id = createId();
+  const objectKey = `uploads/brands/${brandId}/${id}.${extensionForImageMime(file.type)}`;
+  const uploadError = await putStoredObject({
+    objectKey,
+    body: Buffer.from(await file.arrayBuffer()),
+    contentType: file.type,
+  });
+  if (uploadError) {
+    return { error: uploadError };
+  }
+
   if (existing.length > 0) {
     await db.delete(mediaAssets).where(eq(mediaAssets.brandId, brandId));
     await Promise.all(
       existing.map((row) => storage.deleteObject(row.objectKey)),
     );
   }
-
-  const id = createId();
-  const objectKey = `uploads/brands/${brandId}/${id}.${extensionForImageMime(file.type)}`;
-  await storage.putObject({
-    objectKey,
-    body: Buffer.from(await file.arrayBuffer()),
-    contentType: file.type,
-  });
 
   await db.insert(mediaAssets).values({
     id,
