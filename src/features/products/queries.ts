@@ -20,6 +20,10 @@ import type {
   CatalogPricePresence,
   CatalogSort,
 } from "@/features/products/domain/catalog-sort";
+import {
+  CATALOG_MIN_PAGE_SIZE,
+  normalizeCatalogPageSize,
+} from "@/features/products/domain/catalog-page-size";
 import { toIlikeContainsPattern } from "@/features/products/domain/catalog-text-search";
 import { parseProductSpecs } from "@/features/products/domain/product-specs";
 import { resolveProductPrices } from "@/features/promotions/application/resolve-product-prices";
@@ -44,7 +48,7 @@ export type {
 } from "@/features/products/types";
 
 const RELATED_PRODUCTS_LIMIT = 4;
-export const CATALOG_PAGE_SIZE = 24;
+export const CATALOG_PAGE_SIZE = CATALOG_MIN_PAGE_SIZE;
 export const HOME_NEW_PRODUCTS_LIMIT = 8;
 
 function toCatalogProduct(
@@ -331,9 +335,10 @@ export async function getActiveProductsByIds(
 async function loadActiveProductsPage(
   locale: Locale,
   page: number,
-  filter?: CatalogListFilter,
+  filter: CatalogListFilter | undefined,
+  pageSize: number,
 ): Promise<{ products: CatalogProduct[]; total: number; pageSize: number }> {
-  const offset = (page - 1) * CATALOG_PAGE_SIZE;
+  const offset = (page - 1) * pageSize;
   const where = catalogListWhere(filter);
 
   const [[countRow], rows] = await Promise.all([
@@ -346,7 +351,7 @@ async function loadActiveProductsPage(
       .from(products)
       .where(where)
       .orderBy(catalogOrderBy(locale, filter?.sort))
-      .limit(CATALOG_PAGE_SIZE)
+      .limit(pageSize)
       .offset(offset),
   ]);
 
@@ -355,7 +360,7 @@ async function loadActiveProductsPage(
   return {
     products: enriched,
     total: countRow?.count ?? 0,
-    pageSize: CATALOG_PAGE_SIZE,
+    pageSize,
   };
 }
 
@@ -364,15 +369,18 @@ export async function getActiveProductsPage(
   locale: Locale,
   page: number,
   filter?: CatalogListFilter,
+  pageSize: number = CATALOG_PAGE_SIZE,
 ): Promise<{ products: CatalogProduct[]; total: number; pageSize: number }> {
   const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const safePageSize = normalizeCatalogPageSize(pageSize);
 
   return unstable_cache(
-    async () => loadActiveProductsPage(locale, safePage, filter),
+    async () => loadActiveProductsPage(locale, safePage, filter, safePageSize),
     [
       "active-products-page",
       locale,
       String(safePage),
+      String(safePageSize),
       catalogFilterCacheKey(filter),
     ],
     {
@@ -451,10 +459,19 @@ export async function getNewestProducts(
   )();
 }
 
+function decodeProductSlugParam(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 export async function getProductBySlug(
   locale: Locale,
   slug: string,
 ): Promise<CatalogProduct | null> {
+  const decodedSlug = decodeProductSlugParam(slug);
   const [product] = await getDb()
     .select()
     .from(products)
@@ -462,7 +479,7 @@ export async function getProductBySlug(
       and(
         eq(products.status, "ACTIVE"),
         isNull(products.deletedAt),
-        sql`${products.translations}->${locale}->>'slug' = ${slug}`,
+        sql`${products.translations}->${locale}->>'slug' = ${decodedSlug}`,
       ),
     )
     .limit(1);

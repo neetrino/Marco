@@ -22,4 +22,17 @@ describe("product specs", () => {
   it("slugifies product titles", () => {
     expect(slugifyProductTitle("  White Tee!  ")).toBe("white-tee");
   });
+
+  it("transliterates Armenian titles into Latin slugs", () => {
+    expect(slugifyProductTitle("Ճարպաջեռոց Hausberg HB-2343AB")).toBe(
+      "charpajerots-hausberg-hb-2343ab",
+    );
+    expect(slugifyProductTitle("ճարպաջեռոց-hausberg-hb-2343ab")).toBe(
+      "charpajerots-hausberg-hb-2343ab",
+    );
+    expect(slugifyProductTitle("Ոսկե գդալ")).toBe("oske-gdal");
+    expect(slugifyProductTitle("և")).toBe("yev");
+    expect(slugifyProductTitle("киреи")).toBe("kirei");
+    expect(slugifyProductTitle("Мона 1")).toBe("mona-1");
+  });
 });

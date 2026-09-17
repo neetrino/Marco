@@ -15,6 +15,7 @@ import {
   groupSelectedAttributeValueIds,
   type CatalogFacets,
 } from "@/features/products/domain/catalog-filters";
+import { catalogPageSizeForFacets } from "@/features/products/domain/catalog-page-size";
 import {
   amdRangeToDisplayMajor,
   displayMajorRangeToAmd,
@@ -194,12 +195,20 @@ export async function loadStorefrontCatalog(
     filters.attributeValueIds,
   );
 
+  const pageSize = catalogPageSizeForFacets(
+    {
+      ...facets,
+      attributes: displayFacets.attributes,
+      colors: displayFacets.colors,
+    },
+    filters.categorySlugs,
+  );
   let page = filters.page;
-  let catalog = await getActiveProductsPage(locale, page, listFilter);
+  let catalog = await getActiveProductsPage(locale, page, listFilter, pageSize);
   const totalPages = Math.max(1, Math.ceil(catalog.total / catalog.pageSize));
   if (page > totalPages) {
     page = totalPages;
-    catalog = await getActiveProductsPage(locale, page, listFilter);
+    catalog = await getActiveProductsPage(locale, page, listFilter, pageSize);
   }
 
   return {

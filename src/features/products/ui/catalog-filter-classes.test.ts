@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CATALOG_FILTER_ASIDE,
+  CATALOG_FILTER_LIST,
   catalogFilterBrandLabelClass,
   catalogFilterCategoryLabelClass,
   catalogFilterCheckIconClass,
@@ -10,6 +12,13 @@ import {
 } from "@/features/products/ui/catalog-filter-classes";
 
 describe("catalog filter classes", () => {
+  it("lets filter lists grow with the page instead of scrolling internally", () => {
+    expect(CATALOG_FILTER_LIST).not.toContain("overflow-y-auto");
+    expect(CATALOG_FILTER_LIST).not.toContain("max-h-");
+    expect(CATALOG_FILTER_ASIDE).not.toContain("max-h-");
+    expect(CATALOG_FILTER_ASIDE).not.toContain("sticky");
+  });
+
   it("uses marco-slate for category labels and keeps top-level rows semibold", () => {
     expect(catalogFilterCategoryLabelClass(true, true)).toContain("text-marco-slate");
     expect(catalogFilterCategoryLabelClass(false, true)).toContain("font-semibold");
