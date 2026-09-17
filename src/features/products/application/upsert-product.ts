@@ -19,6 +19,7 @@ import {
   syncProductCategories,
 } from "@/features/products/application/sync-product-relations";
 import { parseProductTags } from "@/features/products/domain/product-presentation";
+import { allocateUniqueProductSlug } from "@/features/products/application/allocate-product-slug";
 import { parseProductSpecs } from "@/features/products/domain/product-specs";
 import {
   DEFAULT_PRODUCT_STOCK,
@@ -139,7 +140,8 @@ export async function createProductFromDrawerAction(
   if ("error" in parsed) {
     return err("VALIDATION_ERROR", parsed.error);
   }
-  const data = normalizeProductPayload(parsed.data);
+  const uniqueSlug = await allocateUniqueProductSlug(parsed.data.slug);
+  const data = normalizeProductPayload({ ...parsed.data, slug: uniqueSlug });
 
   if (
     data.compareAtAmount != null &&
@@ -229,17 +231,6 @@ export async function updateProductFromDrawerAction(
   if ("error" in parsed) {
     return err("VALIDATION_ERROR", parsed.error);
   }
-  const data = normalizeProductPayload(parsed.data);
-
-  if (
-    data.compareAtAmount != null &&
-    data.compareAtAmount < data.priceAmount
-  ) {
-    return err(
-      "VALIDATION_ERROR",
-      "Compare-at price must be greater than or equal to price.",
-    );
-  }
 
   await requireAdmin(locale as Locale);
   const files = collectImageFiles(formData);
@@ -256,6 +247,22 @@ export async function updateProductFromDrawerAction(
 
   if (!existing) {
     return err("NOT_FOUND", "Product not found.");
+  }
+
+  const uniqueSlug = await allocateUniqueProductSlug(
+    parsed.data.slug,
+    existing.id,
+  );
+  const data = normalizeProductPayload({ ...parsed.data, slug: uniqueSlug });
+
+  if (
+    data.compareAtAmount != null &&
+    data.compareAtAmount < data.priceAmount
+  ) {
+    return err(
+      "VALIDATION_ERROR",
+      "Compare-at price must be greater than or equal to price.",
+    );
   }
 
   await getDb()

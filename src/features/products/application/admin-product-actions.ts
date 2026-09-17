@@ -9,7 +9,7 @@ import {
   productIdsSchema,
   type ProductIdsInput,
 } from "@/features/products/schemas/admin-list";
-import { slugifyProductTitle } from "@/features/products/domain/product-specs";
+import { allocateUniqueProductSlug } from "@/features/products/application/allocate-product-slug";
 import {
   DEFAULT_PRODUCT_STOCK,
   PRODUCT_RESTOCK_AT,
@@ -151,7 +151,10 @@ export async function toggleProductVisibilityAction(
   return ok({ status: nextStatus });
 }
 
-function withCopySuffix(translations: TranslationsJson): TranslationsJson {
+function withCopySuffix(
+  translations: TranslationsJson,
+  slug: string,
+): TranslationsJson {
   const next: TranslationsJson = {};
   for (const locale of ["hy", "en", "ru"] as const) {
     const entry = translations[locale];
@@ -159,7 +162,7 @@ function withCopySuffix(translations: TranslationsJson): TranslationsJson {
     next[locale] = {
       ...entry,
       title: `${entry.title} (copy)`,
-      slug: slugifyProductTitle(`${entry.slug}-copy-${createId().slice(0, 8)}`),
+      slug,
     };
   }
   return next;
@@ -185,12 +188,20 @@ export async function duplicateProductAction(
     return err("NOT_FOUND", "Product not found.");
   }
 
+  const baseSlug =
+    existing.translations.hy?.slug ??
+    existing.translations.en?.slug ??
+    existing.translations.ru?.slug ??
+    "product";
+  const slug = await allocateUniqueProductSlug(baseSlug);
+  const translations = withCopySuffix(existing.translations, slug);
+
   const id = createId();
   const skuSuffix = createId().slice(0, 6);
   await getDb().insert(products).values({
     id,
     sku: `${existing.sku}-COPY-${skuSuffix}`,
-    translations: withCopySuffix(existing.translations),
+    translations,
     priceAmount: existing.priceAmount,
     compareAtAmount: existing.compareAtAmount,
     stockOnHand: DEFAULT_PRODUCT_STOCK,
@@ -208,7 +219,7 @@ export async function duplicateProductAction(
 
   revalidateProducts(locale, {
     id,
-    translations: withCopySuffix(existing.translations),
+    translations,
   });
   return ok({ id });
 }
