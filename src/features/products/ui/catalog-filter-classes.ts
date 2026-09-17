@@ -2,11 +2,7 @@ export const CATALOG_LAYOUT =
   "flex flex-col gap-6 min-[744px]:flex-row min-[744px]:items-start min-[744px]:gap-5 xl:gap-8";
 
 export const CATALOG_FILTER_ASIDE =
-  "hidden w-[16rem] shrink-0 border-r border-[#e2e8f0] bg-white pb-4 pr-3 min-[744px]:sticky min-[744px]:top-28 min-[744px]:flex min-[744px]:max-h-[calc(100dvh-7rem)] min-[744px]:flex-col min-[744px]:self-start xl:w-[20rem] xl:pb-6 xl:pr-6";
-
-/** Scrollable body under the sticky catalog title. */
-export const CATALOG_FILTER_ASIDE_SCROLL =
-  "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1";
+  "hidden w-[16rem] shrink-0 border-r border-[#e2e8f0] bg-white pb-4 pr-3 min-[744px]:flex min-[744px]:flex-col min-[744px]:self-start xl:w-[20rem] xl:pb-6 xl:pr-6";
 
 export const CATALOG_FILTER_SECTION =
   "mb-4 border-b border-solid border-[#e2e8f0] pb-4 last:mb-0 last:border-b-0";
@@ -23,7 +19,7 @@ export const CATALOG_FILTER_COUNT =
 export const CATALOG_CHECKBOX_BOX =
   "flex size-5 shrink-0 items-center justify-center rounded border-2 border-solid";
 
-export const CATALOG_FILTER_LIST = "flex max-h-[18rem] flex-col gap-3 overflow-y-auto pr-2.5";
+export const CATALOG_FILTER_LIST = "flex flex-col gap-3";
 
 export const CATALOG_FILTER_ROW_SELECTED =
   "rounded-full bg-marco-gray py-1 pl-1 pr-2";

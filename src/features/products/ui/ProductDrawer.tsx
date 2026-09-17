@@ -265,7 +265,7 @@ function ProductDrawerForm({
       ? newImages.findIndex((image) => image.key === primaryImage.key)
       : null;
 
-    const slugValue = form.slug.trim() || slugifyProductTitle(form.title);
+    const slugValue = slugifyProductTitle(form.slug.trim() || form.title);
     const variantPayload =
       form.productType === "VARIABLE"
         ? form.variants.map(buildVariantPayload)

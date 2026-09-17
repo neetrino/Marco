@@ -15,6 +15,7 @@ import {
   MAX_PRODUCT_SPECS,
   MAX_SPEC_TITLE_LENGTH,
   MAX_SPEC_VALUE_LENGTH,
+  slugifyProductTitle,
 } from "@/features/products/domain/product-specs";
 import { VARIANT_DISCOUNT_TYPES } from "@/features/products/domain/variant-discount";
 
@@ -83,7 +84,12 @@ export const productUpsertSchema = z
     productType: z.enum(PRODUCT_TYPES),
     sku: z.string().trim().min(1).max(120),
     title: z.string().trim().min(1).max(200),
-    slug: z.string().trim().min(1).max(200),
+    slug: z
+      .string()
+      .trim()
+      .min(1)
+      .max(200)
+      .transform((value) => slugifyProductTitle(value)),
     description: z.string().trim().max(8000).optional(),
     priceAmount: z.number().int().nonnegative(),
     compareAtAmount: z.number().int().nonnegative().nullable(),

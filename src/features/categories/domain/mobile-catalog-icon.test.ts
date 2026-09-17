@@ -19,6 +19,7 @@ describe("resolveMobileCatalogIconKey", () => {
     expect(resolveMobileCatalogIconKey("aksesuar", "Աքսեսուար")).toBe(
       "accessory",
     );
+    expect(resolveMobileCatalogIconKey("spung", "Սպունգ")).toBe("sponge");
   });
 
   it("maps electronics categories", () => {

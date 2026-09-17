@@ -11,6 +11,7 @@ export const MOBILE_CATALOG_ICON_KEYS = [
   "chair",
   "board",
   "accessory",
+  "sponge",
   "tv",
   "audio",
   "kitchen",
@@ -73,6 +74,17 @@ const ICON_RULES: readonly IconRule[] = [
     ],
   },
   {
+    key: "sponge",
+    aliases: [
+      "spung",
+      "սպունգ",
+      "sponge",
+      "поролон",
+      "porolon",
+      "foam",
+    ],
+  },
+  {
     key: "accessory",
     aliases: [
       "aksesuar",
@@ -81,10 +93,9 @@ const ICON_RULES: readonly IconRule[] = [
       "фурнитур",
       "hinge",
       "knob",
-      "spung",
-      "սպունգ",
-      "sponge",
-      "поролон",
+      "ծխն",
+      "կոճակ",
+      "ручка",
     ],
   },
   {

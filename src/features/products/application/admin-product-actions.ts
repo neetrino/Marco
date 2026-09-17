@@ -9,6 +9,7 @@ import {
   productIdsSchema,
   type ProductIdsInput,
 } from "@/features/products/schemas/admin-list";
+import { slugifyProductTitle } from "@/features/products/domain/product-specs";
 import {
   DEFAULT_PRODUCT_STOCK,
   PRODUCT_RESTOCK_AT,
@@ -158,7 +159,7 @@ function withCopySuffix(translations: TranslationsJson): TranslationsJson {
     next[locale] = {
       ...entry,
       title: `${entry.title} (copy)`,
-      slug: `${entry.slug}-copy-${createId().slice(0, 8)}`,
+      slug: slugifyProductTitle(`${entry.slug}-copy-${createId().slice(0, 8)}`),
     };
   }
   return next;

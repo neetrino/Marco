@@ -181,7 +181,7 @@ export function useProductDrawerForm(args: {
     setTitle(value);
   }
 
-  const resolvedSlug = slugTouched ? slug : slugifyProductTitle(title);
+  const resolvedSlug = slugifyProductTitle(slugTouched ? slug || title : title);
 
   return {
     tab,

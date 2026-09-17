@@ -1,12 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { AppLink } from "@/components/ui/AppLink";
 import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
-import { resolveMobileCatalogRowIconUrl } from "@/features/categories/domain/mobile-catalog-icon";
+import { HeaderCategoryIcon } from "@/features/categories/ui/HeaderCategoryIcon";
 import {
   MOBILE_BROWSE_NESTED_LIST_CLASS,
   MOBILE_BROWSE_ROW_CLASS,
@@ -17,6 +16,8 @@ import {
   MOBILE_BROWSE_SECTION_TITLE_CLASS,
 } from "@/features/categories/ui/mobile-catalog-browse.classes";
 
+const ROW_ICON_PX = 28;
+
 type MobileCatalogBrowseSectionProps = {
   category: HeaderCategoryNode;
   hrefFor: (slug: string) => string;
@@ -26,7 +27,8 @@ type MobileCatalogBrowseSectionProps = {
 };
 
 /**
- * Root title + real subcategory tree: title filters, chevron expands children.
+ * Root title + subcategory tree.
+ * Group parents keep desktop mega-menu icons; nested children are text-only.
  */
 export function MobileCatalogBrowseSection({
   category,
@@ -88,34 +90,37 @@ function CategoryTreeRow({
 }) {
   const hasChildren = node.children.length > 0;
   const [open, setOpen] = useState(false);
-  const iconSrc = resolveMobileCatalogRowIconUrl(
-    node.slug,
-    node.title,
-    node.imageUrl,
-  );
-  const padLeft = depth > 0 ? Math.min(depth, 3) * 12 : 0;
+  const isGroupParent = depth === 0;
+  const padLeft = isGroupParent ? 7 : 7 + Math.min(depth, 3) * 12;
 
   return (
     <li>
-      <div className={MOBILE_BROWSE_ROW_CLASS} style={{ paddingLeft: 7 + padLeft }}>
+      <div className={MOBILE_BROWSE_ROW_CLASS} style={{ paddingLeft: padLeft }}>
         <AppLink
           href={hrefFor(node.slug)}
           prefetchPolicy="none"
           onClick={onNavigate}
           className="flex min-w-0 flex-1 items-center gap-1"
         >
-          <span className="flex size-[52px] shrink-0 items-center justify-center p-[7px]">
-            <Image
-              src={iconSrc}
-              alt=""
-              width={28}
-              height={28}
-              className="size-7 object-contain"
-              unoptimized={iconSrc.endsWith(".svg")}
-              draggable={false}
-            />
+          {isGroupParent ? (
+            <span className="flex size-[52px] shrink-0 items-center justify-center p-[7px] text-marco-slate">
+              <HeaderCategoryIcon
+                slug={node.slug}
+                title={node.title}
+                imageUrl={node.imageUrl}
+                size={ROW_ICON_PX}
+              />
+            </span>
+          ) : null}
+          <span
+            className={
+              isGroupParent
+                ? `${MOBILE_BROWSE_ROW_LABEL_CLASS} font-semibold text-black/80`
+                : MOBILE_BROWSE_ROW_LABEL_CLASS
+            }
+          >
+            {node.title}
           </span>
-          <span className={MOBILE_BROWSE_ROW_LABEL_CLASS}>{node.title}</span>
         </AppLink>
 
         {hasChildren ? (
