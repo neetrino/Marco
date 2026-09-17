@@ -142,6 +142,9 @@ function transliterateToLatin(value: string): string {
   return result;
 }
 
+/** Max length of a storefront product slug (matches URL filter limits). */
+export const PRODUCT_SLUG_MAX_LENGTH = 120;
+
 /** Builds a Latin, URL-safe product slug from a title. */
 export function slugifyProductTitle(title: string): string {
   const slug = transliterateToLatin(title)
@@ -151,7 +154,7 @@ export function slugifyProductTitle(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 120);
+    .slice(0, PRODUCT_SLUG_MAX_LENGTH);
 
   return slug || "product";
 }

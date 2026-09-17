@@ -6,7 +6,8 @@ import type { Locale } from "@/lib/i18n/config";
 const MARCO_LOGO_SRC = "/logo.webp";
 const MARCO_LOGO_INTRINSIC_WIDTH = 1080;
 const MARCO_LOGO_INTRINSIC_HEIGHT = 1350;
-const MARCO_LOGO_SIZES = "(min-width: 768px) 768px, 640px";
+/** Displayed frame is 83×73 CSS px (`h-20` + aspect box); keep sizes aligned so preload matches the used srcset. */
+const MARCO_LOGO_SIZES = "83px";
 
 type MarcoLogoProps = {
   locale: Locale;

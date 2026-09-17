@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { getDb } from "@/db/client";
 import { products, stockMovements, type TranslationsJson } from "@/db/schema";
+import { allocateUniqueProductSlug } from "@/features/products/application/allocate-product-slug";
 import { requireAdmin } from "@/lib/auth/policies";
 import { createId } from "@/lib/id";
 import { isLocale } from "@/lib/i18n/config";
@@ -21,8 +22,9 @@ export async function createProductAction(locale: string, formData: FormData): P
   if (!isLocale(locale)) throw new Error("Invalid locale.");
   const actor = await requireAdmin(locale);
   const data = productSchema.parse(Object.fromEntries(formData));
+  const slug = await allocateUniqueProductSlug(data.slug);
   const id = createId();
-  await getDb().insert(products).values({ id, sku: data.sku, priceAmount: data.priceAmount, stockOnHand: data.stockOnHand, status: data.status, translations: translations(data) });
+  await getDb().insert(products).values({ id, sku: data.sku, priceAmount: data.priceAmount, stockOnHand: data.stockOnHand, status: data.status, translations: translations({ ...data, slug }) });
   if (data.stockOnHand) await getDb().insert(stockMovements).values({ id: createId(), productId: id, delta: data.stockOnHand, reason: "ADMIN_ADJUSTMENT", actorUserId: actor.id, resultingBalance: data.stockOnHand });
   revalidatePath(`/${locale}/products`);
 }
