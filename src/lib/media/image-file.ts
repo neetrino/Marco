@@ -8,6 +8,14 @@ const ALLOWED_MIME = new Set([
 const CATEGORY_ICON_MIME = new Set([...ALLOWED_MIME, "image/svg+xml"]);
 
 export const MEDIA_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const MAX_PRODUCT_GALLERY_IMAGES = 12;
+
+/** True when a FormData entry is a non-empty uploaded image file. */
+export function isNonEmptyImageFile(
+  entry: FormDataEntryValue,
+): entry is File {
+  return entry instanceof File && entry.size > 0;
+}
 
 export function extensionForImageMime(mimeType: string): string {
   if (mimeType === "image/png") return "png";

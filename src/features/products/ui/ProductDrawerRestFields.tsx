@@ -40,6 +40,7 @@ type ProductDrawerRestFieldsProps = {
   onPriceAmountChange: (value: string) => void;
   onDiscountPercentChange: (value: string) => void;
   onSkuChange: (value: string) => void;
+  tooManyImagesLabel: string;
 };
 
 export function ProductDrawerRestFields({
@@ -69,6 +70,7 @@ export function ProductDrawerRestFields({
   onPriceAmountChange,
   onDiscountPercentChange,
   onSkuChange,
+  tooManyImagesLabel,
 }: ProductDrawerRestFieldsProps) {
   return (
     <>
@@ -77,6 +79,7 @@ export function ProductDrawerRestFields({
           images={images}
           disabled={disabled}
           onChange={onImagesChange}
+          tooManyImagesLabel={tooManyImagesLabel}
         />
       </div>
 
