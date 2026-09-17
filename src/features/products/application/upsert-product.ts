@@ -11,6 +11,11 @@ import {
 } from "@/db/schema";
 import { persistProductMedia } from "@/features/products/application/persist-product-media";
 import {
+  isNavigationControlError,
+  productWriteErrorMessage,
+} from "@/features/products/application/product-write-errors";
+import { requireAdmin } from "@/lib/auth/policies";
+import {
   summarizeVariableProduct,
   syncProductVariants,
 } from "@/features/products/application/sync-product-variants";
@@ -30,10 +35,10 @@ import {
   productUpsertSchema,
   type ProductUpsertInput,
 } from "@/features/products/schemas/product-drawer";
-import { requireAdmin } from "@/lib/auth/policies";
 import { invalidateProductsCache } from "@/lib/cache/invalidate-public";
 import { createId } from "@/lib/id";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
+import { logger } from "@/lib/observability/logger";
 import { err, ok, type Result } from "@/lib/result";
 import {
   htmlToPlainText,
@@ -97,10 +102,19 @@ function parsePayload(
   }
 }
 
-function collectImageFiles(formData: FormData): File[] {
-  return formData
-    .getAll("images")
-    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+function wrapProductWrite<T>(
+  action: "products.create_failed" | "products.update_failed",
+  productId: string | undefined,
+  run: () => Promise<Result<T>>,
+): Promise<Result<T>> {
+  return run().catch((error: unknown) => {
+    if (isNavigationControlError(error)) throw error;
+    logger.error(action, {
+      productId,
+      message: error instanceof Error ? error.message : "unknown",
+    });
+    return err("PRODUCT_WRITE_FAILED", productWriteErrorMessage(error));
+  });
 }
 
 function normalizeProductPayload(data: ProductUpsertInput): ProductUpsertInput {
@@ -132,6 +146,15 @@ export async function createProductFromDrawerAction(
   locale: string,
   formData: FormData,
 ): Promise<Result<{ id: string }>> {
+  return wrapProductWrite("products.create_failed", undefined, () =>
+    createProductFromDrawer(locale, formData),
+  );
+}
+
+async function createProductFromDrawer(
+  locale: string,
+  formData: FormData,
+): Promise<Result<{ id: string }>> {
   if (!isLocale(locale)) {
     return err("INVALID_LOCALE", "Invalid locale.");
   }
@@ -155,7 +178,6 @@ export async function createProductFromDrawerAction(
 
   const actor = await requireAdmin(locale as Locale);
   const id = createId();
-  const files = collectImageFiles(formData);
   const initialStock =
     data.productType === "VARIABLE"
       ? data.variants.length * DEFAULT_PRODUCT_STOCK
@@ -202,23 +224,22 @@ export async function createProductFromDrawerAction(
     resultingBalance: initialStock,
   });
 
-  const mediaResult = await persistProductMedia({
-    productId: id,
-    files,
-    primaryNewIndex: data.primaryNewIndex ?? (files.length > 0 ? 0 : null),
-    primaryExistingId: null,
-    removeImageIds: [],
-  });
-  if (mediaResult.error) {
-    return err("VALIDATION_ERROR", mediaResult.error);
-  }
-
   revalidateProducts(locale, { id, slug: data.slug });
   return ok({ id });
 }
 
 /** Updates a product from the admin drawer (fields + optional images). */
 export async function updateProductFromDrawerAction(
+  locale: string,
+  productId: string,
+  formData: FormData,
+): Promise<Result<{ id: string }>> {
+  return wrapProductWrite("products.update_failed", productId, () =>
+    updateProductFromDrawer(locale, productId, formData),
+  );
+}
+
+async function updateProductFromDrawer(
   locale: string,
   productId: string,
   formData: FormData,
@@ -233,7 +254,6 @@ export async function updateProductFromDrawerAction(
   }
 
   await requireAdmin(locale as Locale);
-  const files = collectImageFiles(formData);
 
   const [existing] = await getDb()
     .select({
@@ -303,8 +323,8 @@ export async function updateProductFromDrawerAction(
 
   const mediaResult = await persistProductMedia({
     productId: existing.id,
-    files,
-    primaryNewIndex: data.primaryNewIndex ?? null,
+    files: [],
+    primaryNewIndex: null,
     primaryExistingId: data.primaryExistingId ?? null,
     removeImageIds: data.removeImageIds,
   });

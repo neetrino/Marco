@@ -526,6 +526,8 @@
     "saveProduct": "Save",
     "creating": "Creating…",
     "saving": "Saving…",
+    "saveFailed": "Unable to save the product. Try again, or upload fewer images.",
+    "tooManyImages": "At most {count} images are allowed.",
     "tabBasics": "Basics",
     "tabDescription": "Description",
     "tabMedia": "Media",

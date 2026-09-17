@@ -5,7 +5,11 @@ import Image from "next/image";
 import { X } from "lucide-react";
 
 import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
-import { validateImageFile } from "@/lib/media/image-file";
+import { formatAdminMessage } from "@/features/admin/ui/get-admin-copy";
+import {
+  MAX_PRODUCT_GALLERY_IMAGES,
+  validateImageFile,
+} from "@/lib/media/image-file";
 
 export type ProductDraftImage = {
   key: string;
@@ -20,12 +24,14 @@ type ProductDrawerImagesProps = {
   images: ProductDraftImage[];
   disabled: boolean;
   onChange: (images: ProductDraftImage[]) => void;
+  tooManyImagesLabel: string;
 };
 
 export function ProductDrawerImages({
   images,
   disabled,
   onChange,
+  tooManyImagesLabel,
 }: ProductDrawerImagesProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -54,8 +60,18 @@ export function ProductDrawerImages({
 
   function handleFiles(fileList: FileList | null): void {
     if (!fileList || fileList.length === 0) return;
+    const remainingSlots = MAX_PRODUCT_GALLERY_IMAGES - images.length;
+    if (remainingSlots <= 0) {
+      setFileError(
+        formatAdminMessage(tooManyImagesLabel, {
+          count: MAX_PRODUCT_GALLERY_IMAGES,
+        }),
+      );
+      return;
+    }
+
     const additions: ProductDraftImage[] = [];
-    for (const file of Array.from(fileList)) {
+    for (const file of Array.from(fileList).slice(0, remainingSlots)) {
       const validationError = validateImageFile(file);
       if (validationError) {
         setFileError(validationError);
@@ -69,7 +85,15 @@ export function ProductDrawerImages({
       });
     }
     if (additions.length === 0) return;
-    setFileError(null);
+    if (fileList.length > remainingSlots) {
+      setFileError(
+        formatAdminMessage(tooManyImagesLabel, {
+          count: MAX_PRODUCT_GALLERY_IMAGES,
+        }),
+      );
+    } else {
+      setFileError(null);
+    }
     const merged = [...images, ...additions];
     const first = merged[0];
     if (first && !merged.some((image) => image.isPrimary)) {

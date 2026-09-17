@@ -17,6 +17,7 @@ import {
   extensionForImageMime,
   validateImageFile,
 } from "@/lib/media/image-file";
+import { putStoredObject } from "@/lib/media/put-stored-object";
 
 type VariantImageInput = {
   variantKey: string;
@@ -78,12 +79,18 @@ async function persistVariantImage(
   const assetId = createId();
   const ext = extensionForImageMime(file.type);
   const objectKey = `uploads/products/variants/${variantId}/${assetId}.${ext}`;
-  const body = Buffer.from(await file.arrayBuffer());
-  await storage.putObject({
+  let body: Buffer;
+  try {
+    body = Buffer.from(await file.arrayBuffer());
+  } catch {
+    return "Image upload failed. Please try again.";
+  }
+  const uploadError = await putStoredObject({
     objectKey,
     body,
     contentType: file.type,
   });
+  if (uploadError) return uploadError;
   await db.insert(mediaAssets).values({
     id: assetId,
     objectKey,

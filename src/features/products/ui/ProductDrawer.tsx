@@ -20,6 +20,7 @@ import {
   createProductFromDrawerAction,
   updateProductFromDrawerAction,
 } from "@/features/products/application/upsert-product";
+import { attachProductGalleryImages } from "@/features/products/ui/attach-product-gallery-images";
 import { parseProductTags } from "@/features/products/domain/product-presentation";
 import { compareAtFromDiscountPercent } from "@/features/products/domain/product-discount";
 import {
@@ -213,6 +214,7 @@ function ProductDrawerForm({
 }) {
   const router = useRouter();
   const isEdit = product != null;
+  const [savedProductId, setSavedProductId] = useState(product?.id ?? null);
   const form = useProductDrawerForm({
     product,
     initialCategories,
@@ -321,9 +323,6 @@ function ProductDrawerForm({
 
     const formData = new FormData();
     formData.set("data", JSON.stringify(payload));
-    for (const image of newImages) {
-      if (image.file) formData.append("images", image.file);
-    }
     for (const variant of form.variants) {
       if (variant.image?.file) {
         formData.append("variantImageKeys", variant.key);
@@ -333,16 +332,46 @@ function ProductDrawerForm({
 
     startTransition(async () => {
       form.setError(null);
-      const result =
-        isEdit && product
-          ? await updateProductFromDrawerAction(locale, product.id, formData)
-          : await createProductFromDrawerAction(locale, formData);
-      if (!result.ok) {
-        form.setError(result.error.message);
-        return;
+      try {
+        const result =
+          savedProductId != null
+            ? await updateProductFromDrawerAction(
+                locale,
+                savedProductId,
+                formData,
+              )
+            : await createProductFromDrawerAction(locale, formData);
+        if (!result.ok) {
+          form.setError(result.error.message);
+          return;
+        }
+
+        setSavedProductId(result.value.id);
+        const mediaResult = await attachProductGalleryImages(
+          locale,
+          result.value.id,
+          form.images,
+        );
+        if (mediaResult.uploadedKeys.length > 0) {
+          const uploaded = new Set(mediaResult.uploadedKeys);
+          form.handleImagesChange(
+            form.images.map((image) =>
+              uploaded.has(image.key) && image.file
+                ? { ...image, file: undefined }
+                : image,
+            ),
+          );
+        }
+        if (mediaResult.error) {
+          form.setError(mediaResult.error);
+          return;
+        }
+
+        onClose();
+        router.refresh();
+      } catch {
+        form.setError(copy.saveFailed);
       }
-      onClose();
-      router.refresh();
     });
   }
 
@@ -433,6 +462,7 @@ function ProductDrawerForm({
               onAttributeValueIdsChange={form.setAttributeValueIds}
               onVariantsChange={form.setVariants}
               onImagesChange={form.handleImagesChange}
+              tooManyImagesLabel={copy.tooManyImages}
               onCategoryIdsChange={form.setCategoryIds}
               onBrandIdsChange={form.setBrandIds}
               onPriceAmountChange={form.setPriceAmount}

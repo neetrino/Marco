@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   extensionForImageMime,
+  isNonEmptyImageFile,
+  MAX_PRODUCT_GALLERY_IMAGES,
   validateCategoryIconFile,
   validateImageFile,
 } from "@/lib/media/image-file";
@@ -31,3 +33,21 @@ describe("extensionForImageMime", () => {
     expect(extensionForImageMime("image/svg+xml")).toBe("svg");
   });
 });
+
+describe("isNonEmptyImageFile", () => {
+  it("accepts a non-empty File", () => {
+    expect(isNonEmptyImageFile(fileOf("image/png"))).toBe(true);
+  });
+
+  it("rejects empty files and non-file entries", () => {
+    expect(isNonEmptyImageFile(fileOf("image/png", 0))).toBe(false);
+    expect(isNonEmptyImageFile("not-a-file")).toBe(false);
+  });
+});
+
+describe("MAX_PRODUCT_GALLERY_IMAGES", () => {
+  it("caps the admin gallery at 12 images", () => {
+    expect(MAX_PRODUCT_GALLERY_IMAGES).toBe(12);
+  });
+});
+
