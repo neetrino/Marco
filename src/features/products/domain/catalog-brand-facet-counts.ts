@@ -93,6 +93,53 @@ export function findBrandFacetBySlug(
   return brands.find((brand) => brand.slug === slug) ?? null;
 }
 
+/**
+ * Keeps brands that appear on the current product set.
+ * Active-mode matches stay selectable in place; alternate-only matches
+ * switch listing mode; selected brands stay visible so they can be cleared.
+ */
+export function restrictBrandFacetsToProductScope(
+  brands: readonly CatalogBrandFacet[],
+  activeBrandIds: ReadonlySet<string>,
+  alternateBrandIds: ReadonlySet<string>,
+  alternatePresence: CatalogPricePresence,
+  selectedSlugs: readonly string[] = [],
+): CatalogBrandFacet[] {
+  const selected = new Set(selectedSlugs);
+  const scoped: CatalogBrandFacet[] = [];
+
+  for (const brand of brands) {
+    const inActive = activeBrandIds.has(brand.id);
+    const inAlternate = alternateBrandIds.has(brand.id);
+    if (!inActive && !inAlternate && !selected.has(brand.slug)) continue;
+
+    if (inActive) {
+      scoped.push({
+        id: brand.id,
+        slug: brand.slug,
+        title: brand.title,
+        count: brand.count,
+      });
+      continue;
+    }
+
+    if (inAlternate) {
+      scoped.push({
+        id: brand.id,
+        slug: brand.slug,
+        title: brand.title,
+        count: brand.count,
+        forcePricePresence: alternatePresence,
+      });
+      continue;
+    }
+
+    scoped.push(brand);
+  }
+
+  return scoped;
+}
+
 function mergeBrandFacet(
   active: CatalogBrandFacet | null,
   alternate: CatalogBrandFacet | null,

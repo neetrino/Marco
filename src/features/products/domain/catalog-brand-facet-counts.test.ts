@@ -5,6 +5,7 @@ import {
   findBrandFacetBySlug,
   mergeBrandFacetsByPricePresence,
   resolvePricePresenceForSelectedBrands,
+  restrictBrandFacetsToProductScope,
 } from "@/features/products/domain/catalog-brand-facet-counts";
 import type { CatalogBrandFacet } from "@/features/products/domain/catalog-filters";
 
@@ -102,5 +103,42 @@ describe("findBrandFacetBySlug", () => {
     ];
     expect(findBrandFacetBySlug(brands, "lex")?.id).toBe("b1");
     expect(findBrandFacetBySlug(brands, "missing")).toBeNull();
+  });
+});
+
+describe("restrictBrandFacetsToProductScope", () => {
+  const brands: CatalogBrandFacet[] = [
+    { id: "bosch", slug: "bosch", title: "Bosch", count: 8 },
+    {
+      id: "lex",
+      slug: "lex",
+      title: "Lex",
+      count: 3,
+      forcePricePresence: "without",
+    },
+    { id: "aux", slug: "aux", title: "AUX", count: 2 },
+  ];
+
+  it("keeps only brands that have products in the current set", () => {
+    const scoped = restrictBrandFacetsToProductScope(
+      brands,
+      new Set(["bosch"]),
+      new Set(["lex"]),
+      "without",
+    );
+    expect(scoped.map((brand) => brand.slug)).toEqual(["bosch", "lex"]);
+    expect(scoped[0]?.forcePricePresence).toBeUndefined();
+    expect(scoped[1]?.forcePricePresence).toBe("without");
+  });
+
+  it("keeps a selected brand even when it is outside the product set", () => {
+    const scoped = restrictBrandFacetsToProductScope(
+      brands,
+      new Set(["bosch"]),
+      new Set(),
+      "without",
+      ["aux"],
+    );
+    expect(scoped.map((brand) => brand.slug)).toEqual(["bosch", "aux"]);
   });
 });

@@ -105,7 +105,7 @@
 
 | Param | Type/default | Validation |
 |---|---|---|
-| `q` | trimmed string | max length, normalized whitespace |
+| `q` | trimmed string | max length, normalized whitespace; matches product title/SKU, category title/slug (including descendants), and brand title/slug/SKU |
 | `minPrice` | integer display/base policy | non-negative; conversion filtering policy must be deterministic |
 | `maxPrice` | integer | `>= minPrice` |
 | `category` | locale slug or repeated slugs | active category only |

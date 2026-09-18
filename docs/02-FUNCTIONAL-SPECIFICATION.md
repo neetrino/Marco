@@ -63,6 +63,7 @@
 | CAT-008 | Transparent PNG/WebP asset-ի container-ը theme-aware/transparent է և պարտադիր սպիտակ background չի ավելացնում։ |
 | CAT-009 | Card click-ը տանում է `/{locale}/products/{slug}`; wishlist interaction-ը չի trigger անում card navigation-ը։ |
 | CAT-010 | Unpublished/archived product-ը public catalog-ում չի ցուցադրվում։ |
+| CAT-011 | Category/search scope-ում filter-ները (brand, attribute, color, price bounds) ցույց են տալիս միայն այդ product set-ում առկա արժեքները։ |
 
 ### 4.2 Product detail
 

@@ -77,21 +77,23 @@ export function CatalogFilterPanel({
           }}
         />
       </section>
-      <section className={CATALOG_FILTER_SECTION}>
-        <h2 className={CATALOG_FILTER_TITLE}>{copy.brands}</h2>
-        <CatalogBrandFilter
-          brands={facets.brands}
-          selectedSlugs={selectedBrands}
-          onToggle={(slug) => {
-            const facet = findBrandFacetBySlug(facets.brands, slug);
-            onFiltersChange(
-              withToggledBrand(filters, slug, {
-                forcePricePresence: facet?.forcePricePresence,
-              }),
-            );
-          }}
-        />
-      </section>
+      {facets.brands.length > 0 ? (
+        <section className={CATALOG_FILTER_SECTION}>
+          <h2 className={CATALOG_FILTER_TITLE}>{copy.brands}</h2>
+          <CatalogBrandFilter
+            brands={facets.brands}
+            selectedSlugs={selectedBrands}
+            onToggle={(slug) => {
+              const facet = findBrandFacetBySlug(facets.brands, slug);
+              onFiltersChange(
+                withToggledBrand(filters, slug, {
+                  forcePricePresence: facet?.forcePricePresence,
+                }),
+              );
+            }}
+          />
+        </section>
+      ) : null}
       {priceBounds ? (
         <section className={CATALOG_FILTER_SECTION}>
           <CatalogPriceFilter
