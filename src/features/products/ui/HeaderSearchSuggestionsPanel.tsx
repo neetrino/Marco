@@ -41,11 +41,7 @@ export function HeaderSearchSuggestionsPanel({
   onActiveIndexChange,
 }: HeaderSearchSuggestionsPanelProps) {
   return (
-    <div
-      id={listId}
-      className={HEADER_SEARCH_PANEL_CLASS}
-      onMouseDown={(event) => event.preventDefault()}
-    >
+    <div id={listId} className={HEADER_SEARCH_PANEL_CLASS}>
       <SuggestionList
         listId={listId}
         items={items}

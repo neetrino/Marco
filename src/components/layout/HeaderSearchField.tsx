@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useId, useState, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { catalogHref } from "@/features/products/domain/catalog-href";
 import { EMPTY_CATALOG_SEARCH } from "@/features/products/domain/catalog-search-params";
@@ -42,6 +42,7 @@ export function HeaderSearchField({
   const router = useRouter();
   const searchParams = useSearchParams();
   const listId = useId();
+  const blurTimerRef = useRef<number | null>(null);
   const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const { query, setQuery, items, loading } = useHeaderSearchSuggestions({
@@ -80,11 +81,26 @@ export function HeaderSearchField({
         activeIndex={activeIndex}
         copy={copy}
         onQueryChange={(value) => {
+          if (blurTimerRef.current != null) {
+            window.clearTimeout(blurTimerRef.current);
+            blurTimerRef.current = null;
+          }
+          setFocused(true);
           setQuery(value);
           setActiveIndex(-1);
         }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={() => {
+          if (blurTimerRef.current != null) {
+            window.clearTimeout(blurTimerRef.current);
+            blurTimerRef.current = null;
+          }
+          setFocused(true);
+        }}
+        onBlur={() => {
+          blurTimerRef.current = window.setTimeout(() => {
+            setFocused(false);
+          }, 180);
+        }}
         onKeyDown={handleKeyDown}
         onClear={() => {
           setQuery("");
@@ -144,6 +160,7 @@ function HeaderSearchInput({
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         onFocus={onFocus}
+        onClick={onFocus}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         placeholder={copy.placeholder}
@@ -164,7 +181,6 @@ function HeaderSearchInput({
           type="button"
           className={HEADER_SEARCH_CLEAR_CLASS}
           aria-label={copy.clearLabel}
-          onMouseDown={(event) => event.preventDefault()}
           onClick={onClear}
         >
           <X className="size-3.5" aria-hidden />
