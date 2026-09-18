@@ -240,13 +240,13 @@ function GalleryHoverNav({
   onClick: () => void;
 }) {
   const Icon = side === "left" ? ChevronLeft : ChevronRight;
-  const position = side === "left" ? "left-4" : "right-4";
+  const position = side === "left" ? "left-2 sm:left-4" : "right-2 sm:right-4";
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className={`pointer-events-none absolute ${position} top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.18)] backdrop-blur-sm opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-white`}
+      className={`absolute ${position} top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-white/85 text-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.18)] backdrop-blur-sm transition hover:bg-white md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100`}
     >
       <Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden />
     </button>

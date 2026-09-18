@@ -40,10 +40,17 @@ export function SiteHeaderMainNav({
         <div className="flex items-center gap-3 py-2 min-[1180px]:gap-5">
           <HeaderSearchBar
             locale={locale}
+            currency={currency}
             categoriesLabel={dictionary.nav.categories}
             closeLabel={dictionary.nav.closeMenu}
             seeAllLabel={dictionary.nav.seeAllSubcategories}
-            placeholder={dictionary.header.searchPlaceholder}
+            searchCopy={{
+              placeholder: dictionary.header.searchPlaceholder,
+              suggestionsLabel: dictionary.header.searchSuggestions,
+              seeAllResults: dictionary.header.searchSeeAllResults,
+              noResults: dictionary.header.searchNoResults,
+              clearLabel: dictionary.header.searchClear,
+            }}
             submitLabel={dictionary.header.searchSubmit}
             categories={categories}
           />

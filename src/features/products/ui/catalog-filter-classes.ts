@@ -13,6 +13,14 @@ export const CATALOG_FILTER_TITLE =
 export const CATALOG_FILTER_ROW =
   "flex min-w-0 flex-1 items-center gap-3 text-left text-base leading-6 tracking-[0.16px]";
 
+export const CATALOG_FILTER_ROW_LABEL_GROUP =
+  "flex min-w-0 flex-1 items-center gap-2";
+
+export const CATALOG_FILTER_BRAND_LOGO_WIDTH_PX = 72;
+export const CATALOG_FILTER_BRAND_LOGO_HEIGHT_PX = 24;
+export const CATALOG_FILTER_BRAND_LOGO_CLASS =
+  "h-6 w-auto max-w-[72px] shrink-0 object-contain object-left";
+
 export const CATALOG_FILTER_COUNT =
   "shrink-0 whitespace-nowrap text-base leading-6 tracking-[-0.31px] text-[#90a1b9]";
 

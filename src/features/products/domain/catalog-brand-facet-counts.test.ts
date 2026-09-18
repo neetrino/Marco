@@ -18,14 +18,20 @@ describe("buildBrandFacetsWithCounts", () => {
     expect(
       buildBrandFacetsWithCounts(
         [
-          { id: "b1", slug: "lex", title: "Lex" },
+          { id: "b1", slug: "lex", title: "Lex", imageUrl: "https://cdn/lex.png" },
           { id: "b2", slug: "aux", title: "AUX" },
           { id: "b3", slug: "empty", title: "Empty" },
         ],
         productIdsByBrandId,
       ),
     ).toEqual([
-      { id: "b1", slug: "lex", title: "Lex", count: 2 },
+      {
+        id: "b1",
+        slug: "lex",
+        title: "Lex",
+        count: 2,
+        imageUrl: "https://cdn/lex.png",
+      },
       { id: "b2", slug: "aux", title: "AUX", count: 1 },
       { id: "b3", slug: "empty", title: "Empty", count: 0 },
     ]);
@@ -35,21 +41,42 @@ describe("buildBrandFacetsWithCounts", () => {
 describe("mergeBrandFacetsByPricePresence", () => {
   it("keeps alternate-only brands and forces the other price mode", () => {
     const merged = mergeBrandFacetsByPricePresence(
-      [{ id: "priced", slug: "priced", title: "Priced", count: 2 }],
+      [
+        {
+          id: "priced",
+          slug: "priced",
+          title: "Priced",
+          count: 2,
+          imageUrl: "https://cdn/priced.png",
+        },
+      ],
       [
         { id: "priced", slug: "priced", title: "Priced", count: 0 },
-        { id: "royax", slug: "royax", title: "Royax", count: 3 },
+        {
+          id: "royax",
+          slug: "royax",
+          title: "Royax",
+          count: 3,
+          imageUrl: "https://cdn/royax.png",
+        },
       ],
       "without",
     );
 
     expect(merged).toEqual([
-      { id: "priced", slug: "priced", title: "Priced", count: 2 },
+      {
+        id: "priced",
+        slug: "priced",
+        title: "Priced",
+        count: 2,
+        imageUrl: "https://cdn/priced.png",
+      },
       {
         id: "royax",
         slug: "royax",
         title: "Royax",
         count: 3,
+        imageUrl: "https://cdn/royax.png",
         forcePricePresence: "without",
       },
     ]);
@@ -108,12 +135,19 @@ describe("findBrandFacetBySlug", () => {
 
 describe("restrictBrandFacetsToProductScope", () => {
   const brands: CatalogBrandFacet[] = [
-    { id: "bosch", slug: "bosch", title: "Bosch", count: 8 },
+    {
+      id: "bosch",
+      slug: "bosch",
+      title: "Bosch",
+      count: 8,
+      imageUrl: "https://cdn/bosch.png",
+    },
     {
       id: "lex",
       slug: "lex",
       title: "Lex",
       count: 3,
+      imageUrl: "https://cdn/lex.png",
       forcePricePresence: "without",
     },
     { id: "aux", slug: "aux", title: "AUX", count: 2 },
@@ -128,7 +162,9 @@ describe("restrictBrandFacetsToProductScope", () => {
     );
     expect(scoped.map((brand) => brand.slug)).toEqual(["bosch", "lex"]);
     expect(scoped[0]?.forcePricePresence).toBeUndefined();
+    expect(scoped[0]?.imageUrl).toBe("https://cdn/bosch.png");
     expect(scoped[1]?.forcePricePresence).toBe("without");
+    expect(scoped[1]?.imageUrl).toBe("https://cdn/lex.png");
   });
 
   it("keeps a selected brand even when it is outside the product set", () => {

@@ -115,7 +115,7 @@ export function ProductDetailView({
         </div>
       </div>
 
-      <div className="mt-24">
+      <div className="mt-6 md:mt-12 lg:mt-24">
         <ProductSpecificationsTable
           title={labels.specifications}
           rows={specRows}

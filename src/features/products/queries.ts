@@ -25,7 +25,11 @@ import {
   CATALOG_MIN_PAGE_SIZE,
   normalizeCatalogPageSize,
 } from "@/features/products/domain/catalog-page-size";
-import { toIlikeContainsPattern } from "@/features/products/domain/catalog-text-search";
+import { CATALOG_SEARCH_SUGGESTION_LIMIT } from "@/features/products/domain/catalog-search-suggestions";
+import {
+  escapeIlikeLiteral,
+  toIlikeContainsPattern,
+} from "@/features/products/domain/catalog-text-search";
 import { parseProductSpecs } from "@/features/products/domain/product-specs";
 import { resolveProductPrices } from "@/features/promotions/application/resolve-product-prices";
 import type {
@@ -422,6 +426,40 @@ async function loadActiveProductsPage(
     total: countRow?.count ?? 0,
     pageSize,
   };
+}
+
+async function loadCatalogProductSuggestions(
+  locale: Locale,
+  query: string,
+): Promise<CatalogProduct[]> {
+  const startsPattern = `${escapeIlikeLiteral(query)}%`;
+  const titleExpr = catalogTitleOrderExpr(locale);
+  const rows = await getDb()
+    .select()
+    .from(products)
+    .where(catalogListWhere({ q: query }))
+    .orderBy(
+      sql`CASE WHEN ${titleExpr} ILIKE ${startsPattern} ESCAPE '\\' THEN 0 ELSE 1 END`,
+      asc(titleExpr),
+    )
+    .limit(CATALOG_SEARCH_SUGGESTION_LIMIT);
+
+  return withProductImages(rows, locale);
+}
+
+/** Compact active-catalog matches for the header search typeahead. */
+export async function searchCatalogProductSuggestions(
+  locale: Locale,
+  query: string,
+): Promise<CatalogProduct[]> {
+  return unstable_cache(
+    async () => loadCatalogProductSuggestions(locale, query),
+    ["catalog-search-suggestions", locale, query],
+    {
+      tags: [CACHE_TAGS.products],
+      revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS,
+    },
+  )();
 }
 
 /** Paginated active catalog for the storefront (tag-cached). */
