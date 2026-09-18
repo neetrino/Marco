@@ -36,7 +36,7 @@ export function ProductSpecificationsTable({
   if (visible.length === 0) return null;
 
   return (
-    <section className="border-t border-gray-200 pt-10" aria-label={title}>
+    <section className="border-t border-gray-200 pt-6 md:pt-10" aria-label={title}>
       <h2 className="text-2xl font-bold tracking-tight text-marco-slate uppercase md:text-3xl">
         {title}
       </h2>

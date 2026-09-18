@@ -30,6 +30,7 @@ export function CatalogBrandFilter({
               label={brand.title}
               selected={selected}
               variant="filled"
+              imageUrl={brand.imageUrl}
               labelClassName={catalogFilterBrandLabelClass(selected)}
               onToggle={() => onToggle(brand.slug)}
             />

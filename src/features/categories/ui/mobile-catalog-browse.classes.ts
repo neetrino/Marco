@@ -40,13 +40,13 @@ export const MOBILE_BROWSE_SECTIONS_CLASS =
   "mt-6 flex flex-col gap-4 pb-8";
 
 export const MOBILE_BROWSE_SECTION_CLASS =
-  "relative flex min-h-[647px] flex-col overflow-hidden rounded-[20px] bg-[#ececec] px-5 pb-5 pt-6";
+  "relative flex flex-col overflow-hidden rounded-[20px] bg-[#ececec] px-5 pb-4 pt-5";
 
 export const MOBILE_BROWSE_SECTION_TITLE_CLASS =
   "shrink-0 text-lg font-semibold tracking-[0.18px] text-black";
 
 export const MOBILE_BROWSE_SECTION_LIST_CLASS =
-  "mt-5 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain pr-1";
+  "mt-3 flex flex-col gap-1 pr-1";
 
 export const MOBILE_BROWSE_ROW_CLASS =
   "flex h-[54px] shrink-0 items-center gap-1 rounded-2xl pr-[7px] transition-colors hover:bg-black/[0.03] active:bg-black/[0.05]";

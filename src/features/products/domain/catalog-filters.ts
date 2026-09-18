@@ -18,6 +18,8 @@ export type CatalogBrandFacet = {
   slug: string;
   title: string;
   count: number;
+  /** Primary brand mark shown beside the filter label. */
+  imageUrl?: string | null;
   /**
    * When the brand has no products in the active price mode but has some
    * in the other mode, selecting it should switch listing to that mode.

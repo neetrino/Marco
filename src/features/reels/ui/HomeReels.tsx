@@ -12,7 +12,6 @@ import { HomeSectionHeading } from "@/features/home/ui/HomeSectionHeading";
 import { HOME_PAGE_SHELL_CLASS } from "@/features/home/ui/home-section-classes";
 import {
   HOME_RAIL_TO_DOTS_GAP_PX,
-  HOME_REELS_LABEL_FONT_SIZE_PX,
   HOME_REELS_MOBILE_RAIL_BLEED_LEFT_PX,
   HOME_REELS_MOBILE_TILE_BASIS_CSS,
   HOME_REELS_TITLE_TO_RAIL_GAP_PX,
@@ -182,16 +181,13 @@ function HomeReelTile({
   onOpen: (reel: StorefrontReel) => void;
 }) {
   const title = reel.title.trim();
-  const parts = title.split(/\s+/);
-  const twoWords = parts.length === 2;
   const ariaLabel = title ? `${playLabel}: ${title}` : playLabel;
 
   return (
     <button
       type="button"
-      title={title || undefined}
       onClick={() => onOpen(reel)}
-      className="group flex min-w-0 shrink-0 flex-col items-center gap-2.5 text-center transition-transform duration-200 hover:-translate-y-0.5 max-md:flex-[0_0_var(--reels-mobile-tile-basis)] md:min-w-[148px]"
+      className="group flex min-w-0 shrink-0 flex-col items-center transition-transform duration-200 hover:-translate-y-0.5 max-md:flex-[0_0_var(--reels-mobile-tile-basis)] md:min-w-[148px]"
       aria-label={ariaLabel}
     >
       <div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden rounded-full border border-gray-200 bg-marco-gray shadow-[0_6px_16px_rgba(0,0,0,0.08)] transition-shadow group-hover:shadow-[0_12px_26px_rgba(0,0,0,0.18)] md:h-32 md:w-32">
@@ -204,26 +200,6 @@ function HomeReelTile({
           tabIndex={-1}
         />
       </div>
-      {title ? (
-        <span
-          className={`w-full max-w-full font-medium text-marco-slate md:whitespace-nowrap ${
-            twoWords ? "max-md:leading-snug" : "max-md:truncate"
-          }`}
-          style={{ fontSize: HOME_REELS_LABEL_FONT_SIZE_PX, lineHeight: "21px" }}
-        >
-          {twoWords ? (
-            <>
-              <span className="hidden md:inline">{title}</span>
-              <span className="flex flex-col items-center md:hidden">
-                <span>{parts[0]}</span>
-                <span>{parts[1]}</span>
-              </span>
-            </>
-          ) : (
-            title
-          )}
-        </span>
-      ) : null}
     </button>
   );
 }

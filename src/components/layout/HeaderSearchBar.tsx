@@ -5,19 +5,25 @@ import {
   HEADER_CATEGORIES_PILL_CLASS,
   HEADER_SEARCH_SUBMIT_CLASS,
 } from "@/components/layout/site-header-classes";
-import { HeaderSearchQueryInput } from "@/components/layout/HeaderSearchQueryInput";
+import {
+  HeaderSearchField,
+  type HeaderSearchFieldCopy,
+} from "@/components/layout/HeaderSearchField";
 import { AppLink } from "@/components/ui/AppLink";
 import { HeaderCategoriesDrawer } from "@/features/categories/ui/HeaderCategoriesDrawer";
 import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
 import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@/features/products/domain/catalog-text-search";
+import { HEADER_SEARCH_INPUT_CLASS } from "@/features/products/ui/header-search-suggestions.classes";
 import type { Locale } from "@/lib/i18n/config";
+import type { Currency } from "@/lib/money/currency";
 
 type HeaderSearchBarProps = {
   locale: Locale;
+  currency: Currency;
   categoriesLabel: string;
   closeLabel: string;
   seeAllLabel: string;
-  placeholder: string;
+  searchCopy: HeaderSearchFieldCopy;
   submitLabel: string;
   categories: readonly HeaderCategoryNode[];
 };
@@ -28,7 +34,7 @@ function HeaderSearchQueryFallback({ placeholder }: { placeholder: string }) {
       type="search"
       name="q"
       placeholder={placeholder}
-      className="min-w-0 flex-1 bg-transparent px-2 text-xs text-marco-slate outline-none placeholder:text-marco-slate/60"
+      className={HEADER_SEARCH_INPUT_CLASS}
       aria-label={placeholder}
       autoComplete="off"
       maxLength={CATALOG_SEARCH_QUERY_MAX_LENGTH}
@@ -38,10 +44,11 @@ function HeaderSearchQueryFallback({ placeholder }: { placeholder: string }) {
 
 export function HeaderSearchBar({
   locale,
+  currency,
   categoriesLabel,
   closeLabel,
   seeAllLabel,
-  placeholder,
+  searchCopy,
   submitLabel,
   categories,
 }: HeaderSearchBarProps) {
@@ -71,20 +78,25 @@ export function HeaderSearchBar({
       <form
         action={`/${locale}/products`}
         method="get"
-        className="flex h-10 min-w-0 flex-1 items-center rounded-[89px] bg-marco-gray pr-0 pl-4"
+        className="relative min-w-0 flex-1"
       >
-        <Search
-          className="h-4 w-4 shrink-0 text-marco-slate"
-          aria-hidden
-        />
-        <Suspense
-          fallback={<HeaderSearchQueryFallback placeholder={placeholder} />}
-        >
-          <HeaderSearchQueryInput placeholder={placeholder} />
-        </Suspense>
-        <button type="submit" className={HEADER_SEARCH_SUBMIT_CLASS}>
-          {submitLabel}
-        </button>
+        <div className="relative flex h-10 min-w-0 items-center overflow-visible rounded-[89px] bg-marco-gray pr-0 pl-4">
+          <Search className="h-4 w-4 shrink-0 text-marco-slate" aria-hidden />
+          <Suspense
+            fallback={
+              <HeaderSearchQueryFallback placeholder={searchCopy.placeholder} />
+            }
+          >
+            <HeaderSearchField
+              locale={locale}
+              currency={currency}
+              copy={searchCopy}
+            />
+          </Suspense>
+          <button type="submit" className={HEADER_SEARCH_SUBMIT_CLASS}>
+            {submitLabel}
+          </button>
+        </div>
       </form>
     </div>
   );

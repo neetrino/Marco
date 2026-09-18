@@ -5,7 +5,14 @@ type BrandFacetSource = {
   id: string;
   slug: string;
   title: string;
+  imageUrl?: string | null;
 };
+
+function withBrandImageUrl(
+  brand: Pick<CatalogBrandFacet, "imageUrl">,
+): Pick<CatalogBrandFacet, "imageUrl"> {
+  return brand.imageUrl ? { imageUrl: brand.imageUrl } : {};
+}
 
 /**
  * Builds brand facets with distinct active-product counts for one price mode.
@@ -19,6 +26,7 @@ export function buildBrandFacetsWithCounts(
     slug: brand.slug,
     title: brand.title,
     count: productIdsByBrandId.get(brand.id)?.size ?? 0,
+    ...withBrandImageUrl(brand),
   }));
 }
 
@@ -119,6 +127,7 @@ export function restrictBrandFacetsToProductScope(
         slug: brand.slug,
         title: brand.title,
         count: brand.count,
+        ...withBrandImageUrl(brand),
       });
       continue;
     }
@@ -130,6 +139,7 @@ export function restrictBrandFacetsToProductScope(
         title: brand.title,
         count: brand.count,
         forcePricePresence: alternatePresence,
+        ...withBrandImageUrl(brand),
       });
       continue;
     }
@@ -160,6 +170,7 @@ function mergeBrandFacet(
     slug: base.slug,
     title: base.title,
     count: usesAlternate ? alternateCount : activeCount,
+    ...withBrandImageUrl(base),
     ...(usesAlternate ? { forcePricePresence: alternatePresence } : {}),
   };
 }

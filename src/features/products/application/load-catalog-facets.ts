@@ -14,7 +14,9 @@ import {
   products,
   type LocaleTranslation,
 } from "@/db/schema";
+import { loadBrandImageUrls } from "@/features/brands/application/load-brand-images";
 import { buildCategoryTree } from "@/features/categories/domain/category-tree";
+import { colorFacetsFromAttributes } from "@/features/products/domain/catalog-attribute-facets";
 import {
   buildBrandFacetsWithCounts,
   mergeBrandFacetsByPricePresence,
@@ -23,7 +25,6 @@ import {
   buildCategoryFacetsWithDistinctCounts,
   mergeCategoryFacetsByPricePresence,
 } from "@/features/products/domain/catalog-category-facet-counts";
-import { colorFacetsFromAttributes } from "@/features/products/domain/catalog-attribute-facets";
 import type {
   CatalogAttributeFacet,
   CatalogBrandFacet,
@@ -168,7 +169,13 @@ async function loadBrandFacets(
     .where(isNull(brands.deletedAt))
     .orderBy(asc(brands.sortOrder), asc(brands.createdAt));
 
-  const mapped: { id: string; slug: string; title: string }[] = [];
+  const mapped: {
+    id: string;
+    slug: string;
+    title: string;
+    imageUrl: string | null;
+  }[] = [];
+  const images = await loadBrandImageUrls(rows.map((row) => row.id));
   for (const row of rows) {
     const translation = translationFor(row.translations, locale);
     if (!translation) continue;
@@ -176,6 +183,7 @@ async function loadBrandFacets(
       id: row.id,
       slug: translation.slug,
       title: translation.title,
+      imageUrl: images.get(row.id) ?? null,
     });
   }
 
