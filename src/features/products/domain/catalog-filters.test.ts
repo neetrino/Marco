@@ -6,6 +6,7 @@ import {
   collectBrandIdsForSlugs,
   collectCategoryIdsForSlugs,
   groupSelectedAttributeValueIds,
+  mergeCatalogAttributeValueIds,
   type CatalogAttributeFacet,
   type CatalogBrandFacet,
   type CatalogCategoryFacet,
@@ -113,5 +114,25 @@ describe("attributeValueIdsForColorHexes", () => {
     expect(attributeValueIdsForColorHexes(attributes, ["0000ff"])).toEqual([
       "blue",
     ]);
+  });
+});
+
+describe("mergeCatalogAttributeValueIds", () => {
+  const attributes: CatalogAttributeFacet[] = [
+    {
+      id: "color",
+      key: "color",
+      title: "Color",
+      values: [
+        { id: "red", title: "Red", colorHex: "ff0000" },
+        { id: "blue", title: "Blue", colorHex: "0000ff" },
+      ],
+    },
+  ];
+
+  it("appends unresolved color hexes as attribute ids", () => {
+    expect(
+      mergeCatalogAttributeValueIds(["red"], attributes, ["0000ff"]),
+    ).toEqual(["red", "blue"]);
   });
 });

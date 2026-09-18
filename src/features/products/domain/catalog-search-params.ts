@@ -14,7 +14,7 @@ export const CATALOG_MAX_PRICE_MAJOR = 99_999_999;
 
 export type CatalogSearchParams = {
   page: number;
-  /** Free-text search (title + SKU); null when absent. */
+  /** Free-text search (title, SKU, category name, brand name); null when absent. */
   q: string | null;
   categorySlugs: string[];
   brandSlugs: string[];

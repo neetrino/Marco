@@ -146,3 +146,21 @@ export function attributeValueIdsForColorHexes(
   }
   return ids;
 }
+
+/** Merges `attr` ids with legacy `color` hex query values. */
+export function mergeCatalogAttributeValueIds(
+  attributeValueIds: readonly string[],
+  attributes: readonly CatalogAttributeFacet[],
+  colorHexes: readonly string[] = [],
+): string[] {
+  const fromColors = attributeValueIdsForColorHexes(attributes, colorHexes);
+  if (fromColors.length === 0) return [...attributeValueIds];
+  const seen = new Set(attributeValueIds);
+  const merged = [...attributeValueIds];
+  for (const id of fromColors) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    merged.push(id);
+  }
+  return merged;
+}

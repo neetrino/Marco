@@ -6,6 +6,7 @@ import { cache } from "react";
 
 import { getDb } from "@/db/client";
 import {
+  brands,
   categories,
   mediaAssets,
   productBrands,
@@ -165,7 +166,7 @@ const activeCatalogWhere = and(
 );
 
 export type CatalogListFilter = {
-  /** Normalized free-text query (title + product/variant SKU). */
+  /** Normalized free-text query (title, SKU, category name, brand name). */
   q?: string;
   categoryIds?: readonly string[];
   brandIds?: readonly string[];
@@ -185,6 +186,63 @@ function catalogTitleMatchesQuery(pattern: string) {
   )!;
 }
 
+function catalogJsonbTitleOrSlugMatches(
+  translations:
+    | typeof products.translations
+    | typeof categories.translations
+    | typeof brands.translations,
+  pattern: string,
+) {
+  return or(
+    sql`${translations}->'hy'->>'title' ILIKE ${pattern} ESCAPE '\\'`,
+    sql`${translations}->'en'->>'title' ILIKE ${pattern} ESCAPE '\\'`,
+    sql`${translations}->'ru'->>'title' ILIKE ${pattern} ESCAPE '\\'`,
+    sql`${translations}->'hy'->>'slug' ILIKE ${pattern} ESCAPE '\\'`,
+    sql`${translations}->'en'->>'slug' ILIKE ${pattern} ESCAPE '\\'`,
+    sql`${translations}->'ru'->>'slug' ILIKE ${pattern} ESCAPE '\\'`,
+  )!;
+}
+
+/** Products in a matching category, including descendants of a matched parent. */
+function catalogCategoryNameMatchExists(pattern: string) {
+  return sql`EXISTS (
+    WITH RECURSIVE matched_categories AS (
+      SELECT ${categories.id} AS id
+      FROM ${categories}
+      WHERE ${eq(categories.status, "ACTIVE")}
+        AND ${isNull(categories.deletedAt)}
+        AND (${catalogJsonbTitleOrSlugMatches(categories.translations, pattern)})
+      UNION
+      SELECT child.id
+      FROM ${categories} AS child
+      INNER JOIN matched_categories
+        ON child.parent_id = matched_categories.id
+      WHERE child.status = 'ACTIVE'
+        AND child.deleted_at IS NULL
+    )
+    SELECT 1
+    FROM ${productCategories}
+    WHERE ${productCategories.productId} = ${products.id}
+      AND ${productCategories.categoryId} IN (
+        SELECT id FROM matched_categories
+      )
+  )`;
+}
+
+function catalogBrandNameMatchExists(pattern: string) {
+  return sql`EXISTS (
+    SELECT 1
+    FROM ${productBrands}
+    INNER JOIN ${brands} ON ${brands.id} = ${productBrands.brandId}
+    WHERE ${productBrands.productId} = ${products.id}
+      AND ${isNull(brands.deletedAt)}
+      AND (
+        ${catalogJsonbTitleOrSlugMatches(brands.translations, pattern)}
+        OR ${brands.sku} ILIKE ${pattern} ESCAPE '\\'
+      )
+  )`;
+}
+
 function catalogTextSearchWhere(query: string) {
   const pattern = toIlikeContainsPattern(query);
   const variantSkuMatch = inArray(
@@ -198,6 +256,8 @@ function catalogTextSearchWhere(query: string) {
     catalogTitleMatchesQuery(pattern),
     sql`${products.sku} ILIKE ${pattern} ESCAPE '\\'`,
     variantSkuMatch,
+    catalogCategoryNameMatchExists(pattern),
+    catalogBrandNameMatchExists(pattern),
   )!;
 }
 

@@ -1,18 +1,17 @@
 import "server-only";
 
 import { listCatalogProductAttributeUsages } from "@/features/products/application/load-catalog-attribute-usages";
-import { getCatalogFacets } from "@/features/products/application/load-catalog-facets";
+import { loadScopedCatalogFacets } from "@/features/products/application/scope-storefront-catalog-facets";
 import {
   catalogAttributeIdByValueId,
   collectUsedAttributeValueIds,
   toDisplayAttributeFacets,
 } from "@/features/products/domain/catalog-attribute-facets";
-import { resolvePricePresenceForSelectedBrands } from "@/features/products/domain/catalog-brand-facet-counts";
 import {
-  attributeValueIdsForColorHexes,
   collectBrandIdsForSlugs,
   collectCategoryIdsForSlugs,
   groupSelectedAttributeValueIds,
+  mergeCatalogAttributeValueIds,
   type CatalogFacets,
 } from "@/features/products/domain/catalog-filters";
 import { catalogPageSizeForFacets } from "@/features/products/domain/catalog-page-size";
@@ -26,7 +25,6 @@ import {
   parseCatalogSearchParams,
   type CatalogSearchParams,
 } from "@/features/products/domain/catalog-search-params";
-import type { CatalogPricePresence } from "@/features/products/domain/catalog-sort";
 import {
   getActiveProductsPage,
   type CatalogListFilter,
@@ -61,26 +59,6 @@ function toDisplayBounds(
   );
 }
 
-function mergeAttributeValueIds(
-  filters: CatalogSearchParams,
-  facets: CatalogFacets,
-): string[] {
-  const fromAttr = filters.attributeValueIds;
-  const fromColors = attributeValueIdsForColorHexes(
-    facets.attributes,
-    filters.colorHexes,
-  );
-  if (fromColors.length === 0) return fromAttr;
-  const seen = new Set(fromAttr);
-  const merged = [...fromAttr];
-  for (const id of fromColors) {
-    if (seen.has(id)) continue;
-    seen.add(id);
-    merged.push(id);
-  }
-  return merged;
-}
-
 function toProductFilter(
   filters: CatalogSearchParams,
   facets: CatalogFacets,
@@ -93,7 +71,11 @@ function toProductFilter(
     filters.categorySlugs,
   );
   const brandIds = collectBrandIdsForSlugs(facets.brands, filters.brandSlugs);
-  const attributeValueIds = mergeAttributeValueIds(filters, facets);
+  const attributeValueIds = mergeCatalogAttributeValueIds(
+    filters.attributeValueIds,
+    facets.attributes,
+    filters.colorHexes,
+  );
   const attributeValueIdGroups = groupSelectedAttributeValueIds(
     facets.attributes,
     attributeValueIds,
@@ -135,24 +117,6 @@ function toProductFilter(
   };
 }
 
-async function loadFacetsForPricePresence(
-  locale: Locale,
-  pricePresence: CatalogPricePresence,
-  brandSlugs: readonly string[],
-): Promise<{ facets: CatalogFacets; pricePresence: CatalogPricePresence }> {
-  let facets = await getCatalogFacets(locale, pricePresence);
-  const resolved = resolvePricePresenceForSelectedBrands(
-    facets.brands,
-    brandSlugs,
-    pricePresence,
-  );
-  if (resolved === pricePresence) {
-    return { facets, pricePresence };
-  }
-  facets = await getCatalogFacets(locale, resolved);
-  return { facets, pricePresence: resolved };
-}
-
 /** Loads the filtered storefront catalog, facets, and normalized URL state. */
 export async function loadStorefrontCatalog(
   locale: Locale,
@@ -161,14 +125,18 @@ export async function loadStorefrontCatalog(
 ): Promise<StorefrontCatalogResult> {
   const parsed = parseCatalogSearchParams(searchParams);
   const [{ facets, pricePresence }, quote] = await Promise.all([
-    loadFacetsForPricePresence(locale, parsed.pricePresence, parsed.brandSlugs),
+    loadScopedCatalogFacets(locale, parsed),
     getCheckoutRateSnapshot(currency),
   ]);
   const priceBounds = toDisplayBounds(facets, currency, quote.rate);
   const price = priceBounds
     ? normalizeSelectedPriceRange(parsed.minPrice, parsed.maxPrice, priceBounds)
     : { minPrice: null, maxPrice: null };
-  const attributeValueIds = mergeAttributeValueIds(parsed, facets);
+  const attributeValueIds = mergeCatalogAttributeValueIds(
+    parsed.attributeValueIds,
+    facets.attributes,
+    parsed.colorHexes,
+  );
   const filters: CatalogSearchParams = {
     ...parsed,
     ...price,
