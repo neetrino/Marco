@@ -13,6 +13,7 @@ export type CatalogFilterPanelVariant = "sidebar" | "drawer";
 /**
  * Sidebar keeps category / brand / price first.
  * Mobile drawer puts other facets first so category, price, and brand sit below.
+ * This is display order only; selected filters and toggle behavior are unchanged.
  */
 export function catalogFilterSectionOrder(
   variant: CatalogFilterPanelVariant,
