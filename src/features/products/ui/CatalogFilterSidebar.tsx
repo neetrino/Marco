@@ -60,16 +60,14 @@ export function CatalogFilterSidebar({
     [locale, router],
   );
 
-  const panel = (
-    <CatalogFilterPanel
-      filters={filters}
-      facets={facets}
-      priceBounds={priceBounds}
-      currency={currency}
-      copy={copy}
-      onFiltersChange={onFiltersChange}
-    />
-  );
+  const panelProps = {
+    filters,
+    facets,
+    priceBounds,
+    currency,
+    copy,
+    onFiltersChange,
+  };
 
   return (
     <CatalogViewModeProvider>
@@ -78,7 +76,7 @@ export function CatalogFilterSidebar({
           <div className="mb-4 shrink-0 lg:mb-5 xl:mb-6">
             <CatalogPageTitle title={pageTitle} />
           </div>
-          {panel}
+          <CatalogFilterPanel {...panelProps} variant="sidebar" />
         </aside>
         <div className="min-w-0 flex-1">
           <div className="pb-3 min-[744px]:hidden">
@@ -113,7 +111,9 @@ export function CatalogFilterSidebar({
                   <X className="h-6 w-6" strokeWidth={2} aria-hidden />
                 </button>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto pt-2">{panel}</div>
+              <div className="min-h-0 flex-1 overflow-y-auto pt-2">
+                <CatalogFilterPanel {...panelProps} variant="drawer" />
+              </div>
             </div>
           </SideSheet>
           {children}

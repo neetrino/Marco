@@ -1,8 +1,15 @@
 "use client";
 
+import { Fragment, type ReactNode } from "react";
+
 import { catalogNonColorAttributeFacets } from "@/features/products/domain/catalog-attribute-facets";
 import { findBrandFacetBySlug } from "@/features/products/domain/catalog-brand-facet-counts";
 import { findCategoryFacetBySlug } from "@/features/products/domain/catalog-category-facet-counts";
+import {
+  catalogFilterSectionOrder,
+  type CatalogFilterPanelVariant,
+  type CatalogFilterSectionId,
+} from "@/features/products/domain/catalog-filter-section-order";
 import type { CatalogFacets } from "@/features/products/domain/catalog-filters";
 import {
   withPriceRange,
@@ -41,6 +48,7 @@ type CatalogFilterPanelProps = {
   currency: Currency;
   copy: CatalogFilterCopy;
   onFiltersChange: (next: CatalogSearchParams) => void;
+  variant?: CatalogFilterPanelVariant;
 };
 
 export function CatalogFilterPanel({
@@ -50,7 +58,37 @@ export function CatalogFilterPanel({
   currency,
   copy,
   onFiltersChange,
+  variant = "sidebar",
 }: CatalogFilterPanelProps) {
+  const sections = catalogFilterSectionNodes({
+    filters,
+    facets,
+    priceBounds,
+    currency,
+    copy,
+    onFiltersChange,
+  });
+
+  return (
+    <div className="flex flex-col">
+      {catalogFilterSectionOrder(variant).map((id) => (
+        <Fragment key={id}>{sections[id]}</Fragment>
+      ))}
+    </div>
+  );
+}
+
+function catalogFilterSectionNodes({
+  filters,
+  facets,
+  priceBounds,
+  currency,
+  copy,
+  onFiltersChange,
+}: Omit<CatalogFilterPanelProps, "variant">): Record<
+  CatalogFilterSectionId,
+  ReactNode
+> {
   const selectedCategories = new Set(filters.categorySlugs);
   const selectedBrands = new Set(filters.brandSlugs);
   const selectedAttributeValues = new Set(filters.attributeValueIds);
@@ -58,8 +96,8 @@ export function CatalogFilterPanel({
   const selectedMax = filters.maxPrice ?? priceBounds?.maxMajor ?? 0;
   const textAttributes = catalogNonColorAttributeFacets(facets.attributes);
 
-  return (
-    <div className="flex flex-col">
+  return {
+    categories: (
       <section className={CATALOG_FILTER_SECTION}>
         <h2 className={CATALOG_FILTER_TITLE}>{copy.categories}</h2>
         <CatalogCategoryFilter
@@ -77,7 +115,9 @@ export function CatalogFilterPanel({
           }}
         />
       </section>
-      {facets.brands.length > 0 ? (
+    ),
+    brands:
+      facets.brands.length > 0 ? (
         <section className={CATALOG_FILTER_SECTION}>
           <h2 className={CATALOG_FILTER_TITLE}>{copy.brands}</h2>
           <CatalogBrandFilter
@@ -93,29 +133,30 @@ export function CatalogFilterPanel({
             }}
           />
         </section>
-      ) : null}
-      {priceBounds ? (
-        <section className={CATALOG_FILTER_SECTION}>
-          <CatalogPriceFilter
-            key={`${priceBounds.minMajor}-${priceBounds.maxMajor}-${selectedMin}-${selectedMax}`}
-            title={copy.price}
-            minBound={priceBounds.minMajor}
-            maxBound={priceBounds.maxMajor}
-            selectedMin={selectedMin}
-            selectedMax={selectedMax}
-            currency={currency}
-            minLabel={copy.minPrice}
-            maxLabel={copy.maxPrice}
-            onChange={(min, max) => {
-              const next = normalizeSelectedPriceRange(min, max, priceBounds);
-              onFiltersChange(
-                withPriceRange(filters, next.minPrice, next.maxPrice),
-              );
-            }}
-          />
-        </section>
-      ) : null}
-      {facets.colors.length > 0 ? (
+      ) : null,
+    price: priceBounds ? (
+      <section className={CATALOG_FILTER_SECTION}>
+        <CatalogPriceFilter
+          key={`${priceBounds.minMajor}-${priceBounds.maxMajor}-${selectedMin}-${selectedMax}`}
+          title={copy.price}
+          minBound={priceBounds.minMajor}
+          maxBound={priceBounds.maxMajor}
+          selectedMin={selectedMin}
+          selectedMax={selectedMax}
+          currency={currency}
+          minLabel={copy.minPrice}
+          maxLabel={copy.maxPrice}
+          onChange={(min, max) => {
+            const next = normalizeSelectedPriceRange(min, max, priceBounds);
+            onFiltersChange(
+              withPriceRange(filters, next.minPrice, next.maxPrice),
+            );
+          }}
+        />
+      </section>
+    ) : null,
+    colors:
+      facets.colors.length > 0 ? (
         <section className={CATALOG_FILTER_SECTION}>
           <h2 className={CATALOG_FILTER_TITLE}>{copy.colors}</h2>
           <CatalogColorFilter
@@ -127,19 +168,18 @@ export function CatalogFilterPanel({
             }
           />
         </section>
-      ) : null}
-      {textAttributes.map((attribute) => (
-        <section key={attribute.id} className={CATALOG_FILTER_SECTION}>
-          <h2 className={CATALOG_FILTER_TITLE}>{attribute.title}</h2>
-          <CatalogAttributeFilter
-            attribute={attribute}
-            selectedIds={selectedAttributeValues}
-            onToggle={(valueId) =>
-              onFiltersChange(withToggledAttributeValue(filters, valueId))
-            }
-          />
-        </section>
-      ))}
-    </div>
-  );
+      ) : null,
+    attributes: textAttributes.map((attribute) => (
+      <section key={attribute.id} className={CATALOG_FILTER_SECTION}>
+        <h2 className={CATALOG_FILTER_TITLE}>{attribute.title}</h2>
+        <CatalogAttributeFilter
+          attribute={attribute}
+          selectedIds={selectedAttributeValues}
+          onToggle={(valueId) =>
+            onFiltersChange(withToggledAttributeValue(filters, valueId))
+          }
+        />
+      </section>
+    )),
+  };
 }
