@@ -136,20 +136,23 @@ function buildWhere(filters: AdminProductsFilter, locale: Locale): SQL | undefin
   return and(...conditions);
 }
 
-function orderByClause(filters: AdminProductsFilter, locale: Locale) {
+/** Drafts always sort after non-drafts; secondary key is the user-selected column. */
+function orderByClause(filters: AdminProductsFilter, locale: Locale): SQL[] {
   const direction = filters.dir === "asc" ? asc : desc;
+  const draftsLast = sql`CASE WHEN ${products.status} = 'DRAFT' THEN 1 ELSE 0 END`;
   switch (filters.sort) {
     case "stock":
-      return direction(products.stockOnHand);
+      return [draftsLast, direction(products.stockOnHand)];
     case "price":
-      return direction(products.priceAmount);
+      return [draftsLast, direction(products.priceAmount)];
     case "title":
-      return direction(
-        sql`${products.translations}->${locale}->>'title'`,
-      );
+      return [
+        draftsLast,
+        direction(sql`${products.translations}->${locale}->>'title'`),
+      ];
     case "created":
     default:
-      return direction(products.createdAt);
+      return [draftsLast, direction(products.createdAt)];
   }
 }
 
@@ -233,7 +236,7 @@ export async function listAdminProducts(
     .select()
     .from(products)
     .where(where)
-    .orderBy(orderByClause(filters, locale))
+    .orderBy(...orderByClause(filters, locale))
     .limit(PAGE_SIZE)
     .offset(offset);
 
