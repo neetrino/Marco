@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+
+import { useIsClient } from "@/lib/react/use-is-client";
 
 type ProductGalleryLightboxProps = {
   src: string;
@@ -17,6 +20,8 @@ export function ProductGalleryLightbox({
   closeLabel,
   onClose,
 }: ProductGalleryLightboxProps) {
+  const mounted = useIsClient();
+
   useEffect(() => {
     function onKey(event: KeyboardEvent): void {
       if (event.key === "Escape") onClose();
@@ -30,9 +35,11 @@ export function ProductGalleryLightbox({
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -58,6 +65,7 @@ export function ProductGalleryLightbox({
       >
         <X className="h-7 w-7" aria-hidden />
       </button>
-    </div>
+    </div>,
+    document.body,
   );
 }
