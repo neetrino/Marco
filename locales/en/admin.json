@@ -422,7 +422,7 @@
     "leftBottom": "Left, bottom",
     "rightColumn": "Right column",
     "mobileHint": "Full-width carousel at the top of the mobile home page.",
-    "mobileCarouselHint": "Add up to 5 images. Visitors can swipe; slides auto-advance.",
+    "mobileCarouselHint": "Add up to 5 images (recommended 399×288). Visitors can swipe; slides auto-advance.",
     "heroBanner": "Hero banner",
     "addMobileImage": "Add",
     "removeMobileImage": "Remove image",

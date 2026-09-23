@@ -77,7 +77,7 @@ export function HomeHeroMobileCarousel({ images }: HomeHeroMobileCarouselProps) 
           alt=""
           fill
           priority
-          className="object-contain object-center"
+          className="object-cover object-center"
           sizes={MOBILE_HERO_IMAGE_SIZES}
         />
       </div>
@@ -104,7 +104,7 @@ export function HomeHeroMobileCarousel({ images }: HomeHeroMobileCarouselProps) 
               alt=""
               fill
               priority={index === 0}
-              className="object-contain object-center"
+              className="object-cover object-center"
               sizes={MOBILE_HERO_IMAGE_SIZES}
             />
           </div>

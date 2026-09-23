@@ -422,7 +422,7 @@
     "leftBottom": "Left, bottom",
     "rightColumn": "Right column",
     "mobileHint": "Full-width carousel at the top of the mobile home page.",
-    "mobileCarouselHint": "Մինչև 5 նկար։ Այցելուները կարող են swipe անել, սլայդները ավտոմատ փոխվում են։",
+    "mobileCarouselHint": "Մինչև 5 նկար (խորհուրդ՝ 399×288)։ Այցելուները կարող են swipe անել, սլայդները ավտոմատ փոխվում են։",
     "heroBanner": "Hero banner",
     "addMobileImage": "Ավելացնել",
     "removeMobileImage": "Հեռացնել նկարը",
