@@ -16,7 +16,10 @@ import {
 } from "@/db/schema";
 import { loadBrandImageUrls } from "@/features/brands/application/load-brand-images";
 import { buildCategoryTree } from "@/features/categories/domain/category-tree";
-import { colorFacetsFromAttributes } from "@/features/products/domain/catalog-attribute-facets";
+import {
+  colorFacetsFromAttributes,
+  sortCatalogAttributeValues,
+} from "@/features/products/domain/catalog-attribute-facets";
 import {
   buildBrandFacetsWithCounts,
   mergeBrandFacetsByPricePresence,
@@ -288,7 +291,7 @@ async function loadAttributeFacets(
       id: row.id,
       key: row.key,
       title: translation.title,
-      values,
+      values: sortCatalogAttributeValues(values),
     });
   }
 

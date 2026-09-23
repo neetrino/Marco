@@ -5,7 +5,9 @@ import {
   catalogNonColorAttributeFacets,
   collectUsedAttributeValueIds,
   colorFacetsFromAttributes,
+  parseCatalogAttributeValueNumber,
   restrictCatalogAttributeFacets,
+  sortCatalogAttributeValues,
   type ProductAttributeUsage,
 } from "@/features/products/domain/catalog-attribute-facets";
 import type { CatalogAttributeFacet } from "@/features/products/domain/catalog-filters";
@@ -116,6 +118,30 @@ describe("restrictCatalogAttributeFacets", () => {
     );
     expect(scoped.some((attribute) => attribute.key === "size")).toBe(true);
   });
+
+  it("sorts numeric attribute values ascending", () => {
+    const power: CatalogAttributeFacet[] = [
+      {
+        id: "power",
+        key: "power",
+        title: "Շարժիչի հզորություն (Վտ)",
+        values: [
+          { id: "650", title: "650", colorHex: null },
+          { id: "800", title: "800", colorHex: null },
+          { id: "100", title: "100", colorHex: null },
+        ],
+      },
+    ];
+    const scoped = restrictCatalogAttributeFacets(
+      power,
+      new Set(["650", "800", "100"]),
+    );
+    expect(scoped[0]?.values.map((value) => value.title)).toEqual([
+      "100",
+      "650",
+      "800",
+    ]);
+  });
 });
 
 describe("colorFacetsFromAttributes", () => {
@@ -131,5 +157,52 @@ describe("catalogNonColorAttributeFacets", () => {
   it("exposes every non-color attribute, not a hardcoded size list", () => {
     const text = catalogNonColorAttributeFacets(attributes);
     expect(text.map((attribute) => attribute.key)).toEqual(["size", "width"]);
+  });
+
+  it("sorts size labels alphabetically for display", () => {
+    const text = catalogNonColorAttributeFacets(attributes);
+    const size = text.find((attribute) => attribute.key === "size");
+    expect(size?.values.map((value) => value.title)).toEqual(["L", "M"]);
+  });
+});
+
+describe("parseCatalogAttributeValueNumber", () => {
+  it("reads a leading number and ignores a unit suffix", () => {
+    expect(parseCatalogAttributeValueNumber("650")).toBe(650);
+    expect(parseCatalogAttributeValueNumber("800 Վտ")).toBe(800);
+    expect(parseCatalogAttributeValueNumber("1,5 kg")).toBe(1.5);
+    expect(parseCatalogAttributeValueNumber("M")).toBeNull();
+  });
+});
+
+describe("sortCatalogAttributeValues", () => {
+  it("orders fully numeric labels ascending", () => {
+    const sorted = sortCatalogAttributeValues([
+      { id: "a", title: "650", colorHex: null },
+      { id: "b", title: "800", colorHex: null },
+      { id: "c", title: "100", colorHex: null },
+    ]);
+    expect(sorted.map((value) => value.title)).toEqual(["100", "650", "800"]);
+  });
+
+  it("orders numeric labels that include units", () => {
+    const sorted = sortCatalogAttributeValues([
+      { id: "a", title: "90 cm", colorHex: null },
+      { id: "b", title: "60 cm", colorHex: null },
+      { id: "c", title: "120 cm", colorHex: null },
+    ]);
+    expect(sorted.map((value) => value.title)).toEqual([
+      "60 cm",
+      "90 cm",
+      "120 cm",
+    ]);
+  });
+
+  it("orders non-numeric labels alphabetically", () => {
+    const sorted = sortCatalogAttributeValues([
+      { id: "a", title: "White", colorHex: null },
+      { id: "b", title: "Black", colorHex: null },
+    ]);
+    expect(sorted.map((value) => value.title)).toEqual(["Black", "White"]);
   });
 });

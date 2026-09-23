@@ -1,5 +1,6 @@
 import type {
   CatalogAttributeFacet,
+  CatalogAttributeValueFacet,
   CatalogColorFacet,
 } from "@/features/products/domain/catalog-filters";
 
@@ -7,6 +8,49 @@ export type ProductAttributeUsage = {
   simpleValueIds: readonly string[];
   variants: readonly { valueIds: readonly string[] }[];
 };
+
+/**
+ * Leading number in a filter label (e.g. "650", "800 Վտ", "1,5 kg").
+ * Used so numeric attribute options sort as 100 → 650 → 800, not by insert order.
+ */
+export function parseCatalogAttributeValueNumber(title: string): number | null {
+  const match = title.trim().match(/^(\d+(?:[.,]\d+)?)/);
+  if (!match?.[1]) return null;
+  const value = Number(match[1].replace(",", "."));
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Sorts attribute filter values for the storefront.
+ * Fully numeric labels (optional unit) sort by number; otherwise locale-aware A→Z.
+ */
+export function sortCatalogAttributeValues<
+  T extends Pick<CatalogAttributeValueFacet, "title">,
+>(values: readonly T[]): T[] {
+  if (values.length <= 1) return [...values];
+
+  const numbers = values.map((value) =>
+    parseCatalogAttributeValueNumber(value.title),
+  );
+  if (numbers.every((value) => value != null)) {
+    return values
+      .map((value, index) => ({ value, number: numbers[index]! }))
+      .sort((left, right) => {
+        if (left.number !== right.number) return left.number - right.number;
+        return left.value.title.localeCompare(right.value.title, undefined, {
+          sensitivity: "base",
+        });
+      })
+      .map(({ value }) => value);
+  }
+
+  return [...values].sort((left, right) =>
+    left.title.localeCompare(right.title, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    }),
+  );
+}
 
 /** Maps each attribute value id to its parent attribute id. */
 export function catalogAttributeIdByValueId(
@@ -116,7 +160,9 @@ export function restrictCatalogAttributeFacets(
   for (const id of selectedValueIds) keep.add(id);
 
   return attributes.flatMap((attribute) => {
-    const values = attribute.values.filter((value) => keep.has(value.id));
+    const values = sortCatalogAttributeValues(
+      attribute.values.filter((value) => keep.has(value.id)),
+    );
     return values.length > 0 ? [{ ...attribute, values }] : [];
   });
 }
@@ -142,7 +188,9 @@ export function catalogNonColorAttributeFacets(
   attributes: readonly CatalogAttributeFacet[],
 ): CatalogAttributeFacet[] {
   return attributes.flatMap((attribute) => {
-    const values = attribute.values.filter((value) => value.colorHex == null);
+    const values = sortCatalogAttributeValues(
+      attribute.values.filter((value) => value.colorHex == null),
+    );
     return values.length > 0 ? [{ ...attribute, values }] : [];
   });
 }

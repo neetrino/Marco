@@ -55,6 +55,14 @@ export function SiteHeaderMainNav({
             categories={categories}
           />
 
+          <div className="shrink-0 min-[1180px]:hidden">
+            <CompareHeaderLink
+              locale={locale}
+              label={dictionary.nav.compare}
+              count={compareCount}
+            />
+          </div>
+
           <div className="hidden shrink-0 items-center gap-1 min-[1180px]:flex">
             <LocaleCurrencySwitcher
               locale={locale}
