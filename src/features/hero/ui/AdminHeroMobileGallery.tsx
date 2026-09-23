@@ -65,7 +65,7 @@ export function AdminHeroMobileGallery({
             src={previewUrl}
             alt=""
             fill
-            className="object-contain object-center"
+            className="object-cover object-center"
             sizes="(max-width: 448px) 100vw, 448px"
             unoptimized={previewUrl.startsWith("blob:")}
           />
