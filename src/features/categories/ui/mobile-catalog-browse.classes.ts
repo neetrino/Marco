@@ -4,7 +4,7 @@
  */
 
 export const MOBILE_BROWSE_OVERLAY_CLASS =
-  "fixed inset-0 z-[500] flex flex-col bg-white md:hidden";
+  "fixed inset-0 z-[700] flex flex-col bg-white md:hidden";
 
 export const MOBILE_BROWSE_SCROLL_CLASS =
   "min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-[17px] pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]";

@@ -160,12 +160,15 @@ export async function loadScopedCatalogFacets(
     brandIds: selection.brandIds,
     pricePresence: scoped.pricePresence,
   };
-  const priceBounds = hasPriceBoundScope(priceScope)
-    ? await getCatalogPriceBoundsForFilter(priceScope)
-    : {
-        minPriceAmd: scoped.facets.minPriceAmd,
-        maxPriceAmd: scoped.facets.maxPriceAmd,
-      };
+  const priceBounds =
+    scoped.pricePresence === "without"
+      ? { minPriceAmd: null, maxPriceAmd: null }
+      : hasPriceBoundScope(priceScope)
+        ? await getCatalogPriceBoundsForFilter(priceScope)
+        : {
+            minPriceAmd: scoped.facets.minPriceAmd,
+            maxPriceAmd: scoped.facets.maxPriceAmd,
+          };
 
   return {
     facets: {

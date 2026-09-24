@@ -49,6 +49,7 @@ export async function ProductRelatedSection({
       title={dictionary.product.related}
       previousPageLabel={dictionary.catalog.previousPage}
       nextPageLabel={dictionary.catalog.nextPage}
+      paginationLabel={dictionary.home.productsPaginationLabel}
       wishlistLabel={dictionary.nav.wishlist}
       compareLabel={dictionary.nav.compare}
       addToCartLabel={dictionary.product.addToCart}

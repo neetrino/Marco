@@ -107,9 +107,11 @@ export function ProductGallery({
       </div>
       {showZoom && selected ? (
         <ProductGalleryLightbox
-          src={selected.url}
-          alt={selected.alt || title}
-          closeLabel={labels.closeLightbox}
+          images={images}
+          index={selectedIndex}
+          title={title}
+          labels={labels}
+          onIndexChange={selectIndex}
           onClose={() => setShowZoom(false)}
         />
       ) : null}

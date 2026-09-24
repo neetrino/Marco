@@ -11,6 +11,7 @@ import {
 import type { Currency } from "@/lib/money/currency";
 
 const PRICE_DEBOUNCE_MS = 400;
+const PRICE_STEP = 1000;
 
 const RANGE_INPUT =
   "pointer-events-none absolute inset-0 h-2 w-full appearance-none bg-transparent " +
@@ -87,6 +88,7 @@ export function CatalogPriceFilter({
           type="range"
           min={minBound}
           max={maxBound}
+          step={PRICE_STEP}
           value={minValue}
           disabled={disabled}
           aria-label={minLabel}
@@ -100,6 +102,7 @@ export function CatalogPriceFilter({
           type="range"
           min={minBound}
           max={maxBound}
+          step={PRICE_STEP}
           value={maxValue}
           disabled={disabled}
           aria-label={maxLabel}

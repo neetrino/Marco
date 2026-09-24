@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { MobileNavDrawerCallSection } from "@/components/layout/MobileNavDrawerCallSection";
 import { MobileNavDrawerLocaleSwitch } from "@/components/layout/MobileNavDrawerLocaleSwitch";
@@ -23,6 +24,7 @@ import {
   mobileDrawerNavLinkClass,
   mobileDrawerPopupStateClass,
 } from "@/components/layout/mobile-nav-drawer.classes";
+import { requestMobileCatalogBrowse } from "@/components/layout/request-mobile-catalog-browse";
 import { AppLink } from "@/components/ui/AppLink";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
@@ -36,6 +38,24 @@ type MobileNavDrawerPanelProps = {
   onClose: () => void;
 };
 
+function DrawerNavRowContent({
+  icon: Icon,
+  label,
+}: {
+  icon: LucideIcon;
+  label: string;
+}) {
+  return (
+    <>
+      <span className="flex min-w-0 flex-1 items-center gap-3.5">
+        <Icon className="h-6 w-6 shrink-0" strokeWidth={2} aria-hidden />
+        <span className="truncate">{label}</span>
+      </span>
+      <ChevronRight className="h-5 w-5 shrink-0 opacity-50" aria-hidden />
+    </>
+  );
+}
+
 function MobileDrawerNavList({
   locale,
   dictionary,
@@ -45,13 +65,25 @@ function MobileDrawerNavList({
   const items = buildMobileDrawerNavItems(locale, dictionary);
 
   return (
-    <nav
-      className="flex flex-col"
-      aria-label={dictionary.nav.navigation}
-    >
+    <nav className="flex flex-col" aria-label={dictionary.nav.navigation}>
       {items.map((item) => {
+        if (item.kind === "catalog") {
+          return (
+            <button
+              key="catalog"
+              type="button"
+              className={mobileDrawerNavLinkClass(false)}
+              onClick={() => {
+                onClose();
+                requestMobileCatalogBrowse();
+              }}
+            >
+              <DrawerNavRowContent icon={item.icon} label={item.label} />
+            </button>
+          );
+        }
+
         const active = isMobileDrawerNavActive(pathname, item.href, locale);
-        const Icon = item.icon;
         return (
           <AppLink
             key={item.href}
@@ -61,11 +93,7 @@ function MobileDrawerNavList({
             className={mobileDrawerNavLinkClass(active)}
             onClick={onClose}
           >
-            <span className="flex min-w-0 flex-1 items-center gap-3.5">
-              <Icon className="h-6 w-6 shrink-0" strokeWidth={2} aria-hidden />
-              <span className="truncate">{item.label}</span>
-            </span>
-            <ChevronRight className="h-5 w-5 shrink-0 opacity-50" aria-hidden />
+            <DrawerNavRowContent icon={item.icon} label={item.label} />
           </AppLink>
         );
       })}

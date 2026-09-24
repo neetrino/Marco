@@ -73,7 +73,7 @@
 | PDP-002 | Detail-ը ցույց է տալիս translated title (title section), formatted short text under the price, specifications table, categories, price, compare-at, discount badge, SKU, stock status և warranty (when set)։ |
 | PDP-003 | Quantity control-ը min 1 է և չի անցնում server-confirmed purchasable stock-ը։ |
 | PDP-004 | Add to Cart-ը server-side վերահաստատում է product status/stock/price և վերադարձնում է actionable conflict error։ |
-| PDP-005 | Related products-ը նույն category-ից active products են, current product-ը բացառված է։ |
+| PDP-005 | Related products-ը ապրանքի ամենախոր (leaf) category-ից active products են՝ ծնող category-ի sibling-ները չեն ներառվում; current product-ը բացառված է։ |
 | PDP-006 | Metadata/JSON-LD-ը համապատասխանում է locale-specific canonical product data-ին։ |
 
 ### 4.3 Reviews

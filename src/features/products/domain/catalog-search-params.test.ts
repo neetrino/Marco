@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogHref } from "@/features/products/domain/catalog-href";
+import {
+  catalogHref,
+  withCatalogPricePresence,
+} from "@/features/products/domain/catalog-href";
 import { parseCatalogSearchParams } from "@/features/products/domain/catalog-search-params";
 
 describe("parseCatalogSearchParams", () => {
@@ -115,5 +118,32 @@ describe("catalogHref", () => {
     ).toBe(
       "/hy/products?q=hood&category=hoods&brand=lex&attr=11111111-1111-1111-1111-111111111111&minPrice=7&maxPrice=4975&sort=name-desc&pricePresence=without&page=2",
     );
+  });
+});
+
+describe("withCatalogPricePresence", () => {
+  it("drops the price range when switching to products without a price", () => {
+    expect(
+      withCatalogPricePresence(
+        {
+          page: 3,
+          q: null,
+          categorySlugs: [],
+          brandSlugs: [],
+          colorHexes: [],
+          attributeValueIds: [],
+          minPrice: 7,
+          maxPrice: 4975,
+          sort: "default",
+          pricePresence: "with",
+        },
+        "without",
+      ),
+    ).toMatchObject({
+      page: 1,
+      pricePresence: "without",
+      minPrice: null,
+      maxPrice: null,
+    });
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import {
   MobileNavCartBoldIcon,
@@ -29,9 +29,13 @@ import {
   MOBILE_NAV_INACTIVE_ICON,
   MOBILE_NAV_TOP_CORNER_RADIUS_PX,
 } from "@/components/layout/mobile-bottom-nav.constants";
+import { subscribeMobileCatalogBrowse } from "@/components/layout/request-mobile-catalog-browse";
 import { AppLink } from "@/components/ui/AppLink";
 import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
-import { MobileCatalogBrowseDrawer } from "@/features/categories/ui/MobileCatalogBrowseDrawer";
+import {
+  MobileCatalogBrowseDrawer,
+  mobileCatalogBrowseCopy,
+} from "@/features/categories/ui/MobileCatalogBrowseDrawer";
 import { CartDrawer } from "@/features/cart/ui/CartDrawer";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
@@ -192,6 +196,7 @@ export function MobileBottomNav({
 }: MobileBottomNavProps) {
   const pathname = usePathname() ?? `/${locale}`;
   const [browseOpen, setBrowseOpen] = useState(false);
+  useEffect(() => subscribeMobileCatalogBrowse(() => setBrowseOpen(true)), []);
   const items = buildFloorNavItems(
     locale,
     dictionary,
@@ -283,15 +288,7 @@ export function MobileBottomNav({
         onClose={() => setBrowseOpen(false)}
         locale={locale}
         categories={categories}
-        copy={{
-          title: dictionary.catalog.mobileBrowseTitle,
-          close: dictionary.catalog.closeBrowse,
-          allCategories: dictionary.catalog.allCategories,
-          expandCategory: dictionary.catalog.expandCategory,
-          collapseCategory: dictionary.catalog.collapseCategory,
-          searchPlaceholder: dictionary.catalog.mobileBrowseSearchPlaceholder,
-          searchSubmit: dictionary.header.searchSubmit,
-        }}
+        copy={mobileCatalogBrowseCopy(dictionary)}
       />
     </>
   );

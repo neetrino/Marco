@@ -16,6 +16,7 @@ import {
   products,
 } from "@/db/schema";
 import { loadProductBrandMarks } from "@/features/products/application/load-product-brand-logos";
+import { pickMostSpecificCategoryIds } from "@/features/categories/domain/category-tree";
 import { parseProductTags } from "@/features/products/domain/product-presentation";
 import type {
   CatalogPricePresence,
@@ -52,7 +53,7 @@ export type {
   ProductGalleryImage,
 } from "@/features/products/types";
 
-const RELATED_PRODUCTS_LIMIT = 4;
+const RELATED_PRODUCTS_LIMIT = 32;
 export const CATALOG_PAGE_SIZE = CATALOG_MIN_PAGE_SIZE;
 export const HOME_NEW_PRODUCTS_LIMIT = 8;
 
@@ -709,22 +710,40 @@ export const getProductDetailBySlug = cache(
   },
 );
 
-/** Active products sharing at least one category with the given product. */
+/**
+ * Active products that share the product's most specific (leaf) categories —
+ * parent category links are ignored when a deeper assigned category exists.
+ */
 export async function getRelatedProducts(
   locale: Locale,
   productId: string,
 ): Promise<CatalogProduct[]> {
-  const seedCategories = getDb()
+  const seedRows = await getDb()
     .select({ categoryId: productCategories.categoryId })
     .from(productCategories)
     .where(eq(productCategories.productId, productId));
+
+  const seedIds = seedRows.map((row) => row.categoryId);
+  if (seedIds.length === 0) {
+    return [];
+  }
+
+  const categoryLinks = await getDb()
+    .select({ id: categories.id, parentId: categories.parentId })
+    .from(categories)
+    .where(isNull(categories.deletedAt));
+
+  const relatedCategoryIds = pickMostSpecificCategoryIds(seedIds, categoryLinks);
+  if (relatedCategoryIds.length === 0) {
+    return [];
+  }
 
   const relatedLinks = await getDb()
     .selectDistinct({ productId: productCategories.productId })
     .from(productCategories)
     .where(
       and(
-        inArray(productCategories.categoryId, seedCategories),
+        inArray(productCategories.categoryId, relatedCategoryIds),
         sql`${productCategories.productId} <> ${productId}`,
       ),
     );
