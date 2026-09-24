@@ -76,7 +76,7 @@ export function CatalogFilterSidebar({
           <div className="mb-4 shrink-0 lg:mb-5 xl:mb-6">
             <CatalogPageTitle title={pageTitle} />
           </div>
-          <CatalogFilterPanel {...panelProps} variant="sidebar" />
+          <CatalogFilterPanel {...panelProps} />
         </aside>
         <div className="min-w-0 flex-1">
           <div className="pb-3 min-[744px]:hidden">
@@ -112,7 +112,7 @@ export function CatalogFilterSidebar({
                 </button>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto pt-2">
-                <CatalogFilterPanel {...panelProps} variant="drawer" />
+                <CatalogFilterPanel {...panelProps} />
               </div>
             </div>
           </SideSheet>

@@ -1,25 +1,17 @@
 export const CATALOG_FILTER_SECTION_IDS = [
-  "categories",
   "brands",
   "price",
   "colors",
   "attributes",
+  "categories",
 ] as const;
 
 export type CatalogFilterSectionId = (typeof CATALOG_FILTER_SECTION_IDS)[number];
 
-export type CatalogFilterPanelVariant = "sidebar" | "drawer";
-
 /**
- * Sidebar keeps category / brand / price first.
- * Mobile drawer puts other facets first so category, price, and brand sit below.
- * This is display order only; selected filters and toggle behavior are unchanged.
+ * Desktop sidebar and the mobile filter drawer share this order.
+ * Display order only; selected filters and toggle behavior are unchanged.
  */
-export function catalogFilterSectionOrder(
-  variant: CatalogFilterPanelVariant,
-): readonly CatalogFilterSectionId[] {
-  if (variant === "drawer") {
-    return ["colors", "attributes", "categories", "price", "brands"];
-  }
+export function catalogFilterSectionOrder(): readonly CatalogFilterSectionId[] {
   return CATALOG_FILTER_SECTION_IDS;
 }

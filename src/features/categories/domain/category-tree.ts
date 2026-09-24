@@ -66,6 +66,24 @@ export function flattenCategoryOptions<T extends CategoryLink>(
   return rows;
 }
 
+/**
+ * Among selected category ids, keeps only the most specific ones —
+ * drops any id that is an ancestor of another selected id.
+ * Used so PDP related products match the product's leaf category, not its parent.
+ */
+export function pickMostSpecificCategoryIds(
+  selectedIds: ReadonlyArray<string>,
+  items: ReadonlyArray<CategoryLink>,
+): string[] {
+  const selected = [...new Set(selectedIds)];
+  if (selected.length <= 1) return selected;
+
+  return selected.filter((id) => {
+    const descendants = collectDescendantIds(id, items);
+    return !selected.some((other) => other !== id && descendants.has(other));
+  });
+}
+
 /** Direct and nested descendant ids of a category. */
 export function collectDescendantIds(
   categoryId: string,

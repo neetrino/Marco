@@ -19,6 +19,7 @@ import {
 } from "@/features/categories/ui/mobile-catalog-browse.classes";
 import { catalogHref } from "@/features/products/domain/catalog-href";
 import { EMPTY_CATALOG_SEARCH } from "@/features/products/domain/catalog-search-params";
+import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import { useIsClient } from "@/lib/react/use-is-client";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -31,6 +32,20 @@ export type MobileCatalogBrowseCopy = {
   searchPlaceholder: string;
   searchSubmit: string;
 };
+
+export function mobileCatalogBrowseCopy(
+  dictionary: Dictionary,
+): MobileCatalogBrowseCopy {
+  return {
+    title: dictionary.catalog.mobileBrowseTitle,
+    close: dictionary.catalog.closeBrowse,
+    allCategories: dictionary.catalog.allCategories,
+    expandCategory: dictionary.catalog.expandCategory,
+    collapseCategory: dictionary.catalog.collapseCategory,
+    searchPlaceholder: dictionary.catalog.mobileBrowseSearchPlaceholder,
+    searchSubmit: dictionary.header.searchSubmit,
+  };
+}
 
 type MobileCatalogBrowseDrawerProps = {
   open: boolean;

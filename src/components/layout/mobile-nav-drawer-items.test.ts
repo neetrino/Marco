@@ -4,16 +4,18 @@ import { buildMobileDrawerNavItems } from "@/components/layout/mobile-nav-drawer
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 describe("buildMobileDrawerNavItems", () => {
-  it("omits home and shop and keeps compare first", () => {
+  it("opens categories in place of compare and keeps the other drawer links", () => {
     const items = buildMobileDrawerNavItems("hy", getDictionary("hy"));
 
-    expect(items.map((item) => item.href)).toEqual([
-      "/hy/compare",
+    expect(
+      items.map((item) => (item.kind === "link" ? item.href : item.kind)),
+    ).toEqual([
+      "catalog",
       "/hy/brand",
       "/hy/about",
       "/hy/contact",
       "/hy/reels",
     ]);
-    expect(items[0]?.label).toBe("Համեմատել");
+    expect(items[0]?.label).toBe("Կատեգորիաներ");
   });
 });

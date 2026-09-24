@@ -7,7 +7,6 @@ import { findBrandFacetBySlug } from "@/features/products/domain/catalog-brand-f
 import { findCategoryFacetBySlug } from "@/features/products/domain/catalog-category-facet-counts";
 import {
   catalogFilterSectionOrder,
-  type CatalogFilterPanelVariant,
   type CatalogFilterSectionId,
 } from "@/features/products/domain/catalog-filter-section-order";
 import type { CatalogFacets } from "@/features/products/domain/catalog-filters";
@@ -48,7 +47,6 @@ type CatalogFilterPanelProps = {
   currency: Currency;
   copy: CatalogFilterCopy;
   onFiltersChange: (next: CatalogSearchParams) => void;
-  variant?: CatalogFilterPanelVariant;
 };
 
 export function CatalogFilterPanel({
@@ -58,7 +56,6 @@ export function CatalogFilterPanel({
   currency,
   copy,
   onFiltersChange,
-  variant = "sidebar",
 }: CatalogFilterPanelProps) {
   const sections = catalogFilterSectionNodes({
     filters,
@@ -71,7 +68,7 @@ export function CatalogFilterPanel({
 
   return (
     <div className="flex flex-col">
-      {catalogFilterSectionOrder(variant).map((id) => (
+      {catalogFilterSectionOrder().map((id) => (
         <Fragment key={id}>{sections[id]}</Fragment>
       ))}
     </div>
@@ -85,7 +82,7 @@ function catalogFilterSectionNodes({
   currency,
   copy,
   onFiltersChange,
-}: Omit<CatalogFilterPanelProps, "variant">): Record<
+}: CatalogFilterPanelProps): Record<
   CatalogFilterSectionId,
   ReactNode
 > {
@@ -134,7 +131,7 @@ function catalogFilterSectionNodes({
           />
         </section>
       ) : null,
-    price: priceBounds ? (
+    price: filters.pricePresence === "with" && priceBounds ? (
       <section className={CATALOG_FILTER_SECTION}>
         <CatalogPriceFilter
           key={`${priceBounds.minMajor}-${priceBounds.maxMajor}-${selectedMin}-${selectedMax}`}

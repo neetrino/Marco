@@ -1,11 +1,13 @@
 "use client";
 
 import { chunkItems } from "@/features/home/paginate";
+import { HomePaginationDots } from "@/features/home/ui/HomePaginationDots";
 import { HomeRoundNavButtons } from "@/features/home/ui/HomeRoundNavButtons";
 import {
   HOME_PRODUCT_CARD_GAP_PX,
   HOME_PRODUCT_DESKTOP_PAGE_SIZE,
   HOME_PRODUCT_MOBILE_PAGE_SIZE,
+  HOME_RAIL_TO_DOTS_GAP_PX,
 } from "@/features/home/ui/home-section.constants";
 import { HOME_SCROLLER_CLASS } from "@/features/home/ui/home-section-classes";
 import { useIsMaxMd } from "@/features/home/ui/use-is-max-md";
@@ -26,6 +28,7 @@ type ProductRelatedRailProps = {
   title: string;
   previousPageLabel: string;
   nextPageLabel: string;
+  paginationLabel: string;
   wishlistLabel: string;
   compareLabel: string;
   addToCartLabel: string;
@@ -38,6 +41,7 @@ export function ProductRelatedRail({
   title,
   previousPageLabel,
   nextPageLabel,
+  paginationLabel,
   wishlistLabel,
   compareLabel,
   addToCartLabel,
@@ -45,12 +49,10 @@ export function ProductRelatedRail({
   products,
 }: ProductRelatedRailProps) {
   const isMaxMd = useIsMaxMd();
-  const mobile = useSnapCarousel(
-    Math.max(chunkItems(products, HOME_PRODUCT_MOBILE_PAGE_SIZE).length, 1),
-  );
-  const desktop = useSnapCarousel(
-    Math.max(chunkItems(products, HOME_PRODUCT_DESKTOP_PAGE_SIZE).length, 1),
-  );
+  const mobilePages = chunkItems(products, HOME_PRODUCT_MOBILE_PAGE_SIZE);
+  const desktopPages = chunkItems(products, HOME_PRODUCT_DESKTOP_PAGE_SIZE);
+  const mobile = useSnapCarousel(Math.max(mobilePages.length, 1));
+  const desktop = useSnapCarousel(Math.max(desktopPages.length, 1));
   const active = isMaxMd ? mobile : desktop;
   const showNav = products.length > HOME_PRODUCT_MOBILE_PAGE_SIZE;
 
@@ -73,7 +75,7 @@ export function ProductRelatedRail({
         <RelatedSnapPages
           scrollerRef={mobile.scrollerRef}
           onScroll={mobile.onScroll}
-          pages={chunkItems(products, HOME_PRODUCT_MOBILE_PAGE_SIZE)}
+          pages={mobilePages}
           columns={HOME_PRODUCT_MOBILE_PAGE_SIZE}
           locale={locale}
           wishlistLabel={wishlistLabel}
@@ -86,7 +88,7 @@ export function ProductRelatedRail({
         <RelatedSnapPages
           scrollerRef={desktop.scrollerRef}
           onScroll={desktop.onScroll}
-          pages={chunkItems(products, HOME_PRODUCT_DESKTOP_PAGE_SIZE)}
+          pages={desktopPages}
           columns={HOME_PRODUCT_DESKTOP_PAGE_SIZE}
           locale={locale}
           wishlistLabel={wishlistLabel}
@@ -94,6 +96,24 @@ export function ProductRelatedRail({
           addToCartLabel={addToCartLabel}
           isSignedIn={isSignedIn}
         />
+      </div>
+      <div style={{ marginTop: HOME_RAIL_TO_DOTS_GAP_PX }}>
+        <div className="md:hidden">
+          <HomePaginationDots
+            pageCount={mobilePages.length}
+            activePage={mobile.activePage}
+            label={paginationLabel}
+            onGoToPage={mobile.scrollToPage}
+          />
+        </div>
+        <div className="hidden md:block">
+          <HomePaginationDots
+            pageCount={desktopPages.length}
+            activePage={desktop.activePage}
+            label={paginationLabel}
+            onGoToPage={desktop.scrollToPage}
+          />
+        </div>
       </div>
     </section>
   );

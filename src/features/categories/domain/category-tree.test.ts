@@ -6,6 +6,7 @@ import {
   filterCategoryTree,
   flattenCategoryOptions,
   isInvalidCategoryParent,
+  pickMostSpecificCategoryIds,
 } from "@/features/categories/domain/category-tree";
 
 const furniture = { id: "root", parentId: null };
@@ -69,5 +70,19 @@ describe("category tree", () => {
     expect(filtered[0]?.id).toBe("root");
     expect(filtered[0]?.children[0]?.id).toBe("sofas");
     expect(filtered[0]?.children[0]?.children[0]?.id).toBe("corner");
+  });
+
+  it("keeps only the deepest selected categories for related-product matching", () => {
+    const items = [furniture, sofas, corner, tables];
+    expect(pickMostSpecificCategoryIds(["root", "sofas", "corner"], items)).toEqual([
+      "corner",
+    ]);
+    expect(pickMostSpecificCategoryIds(["root", "tables"], items)).toEqual([
+      "tables",
+    ]);
+    expect(pickMostSpecificCategoryIds(["corner", "tables"], items).sort()).toEqual(
+      ["corner", "tables"].sort(),
+    );
+    expect(pickMostSpecificCategoryIds(["root"], items)).toEqual(["root"]);
   });
 });

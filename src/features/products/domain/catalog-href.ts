@@ -153,5 +153,14 @@ export function withCatalogPricePresence(
   filters: CatalogSearchParams,
   pricePresence: CatalogPricePresence,
 ): CatalogSearchParams {
+  if (pricePresence === "without") {
+    return {
+      ...filters,
+      page: 1,
+      pricePresence,
+      minPrice: null,
+      maxPrice: null,
+    };
+  }
   return { ...filters, page: 1, pricePresence };
 }
