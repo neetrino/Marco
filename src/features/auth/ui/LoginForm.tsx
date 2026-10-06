@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { AppLink } from "@/components/ui/AppLink";
-import { loginAction, type AuthActionState } from "@/features/auth/login-action";
+import { loginAction } from "@/features/auth/login-action";
 import { AuthTextField } from "@/features/auth/ui/AuthTextField";
 import { PasswordField } from "@/features/auth/ui/PasswordField";
 import {
@@ -18,8 +18,6 @@ import {
 } from "@/features/auth/ui/auth-form-classes";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
-
-const initialState: AuthActionState = {};
 
 type LoginFormProps = {
   locale: Locale;
@@ -55,18 +53,36 @@ export function LoginForm({ locale, dictionary }: LoginFormProps) {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const resetSucceeded = searchParams.get("reset") === "1";
-  const action = loginAction.bind(null, locale);
-  const [state, formAction, isPending] = useActionState(action, initialState);
+  const [error, setError] = useState<string | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setError(undefined);
+
+    startTransition(async () => {
+      const result = await loginAction({
+        locale,
+        email: String(formData.get("email") ?? ""),
+        password: String(formData.get("password") ?? ""),
+        next: nextPath,
+      });
+
+      if (result.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <>
       <LoginAlerts
         resetSucceeded={resetSucceeded}
-        error={state.error}
+        error={error}
         dictionary={dictionary}
       />
-      <form action={formAction} className={AUTH_FORM_CLASS}>
-        {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
+      <form onSubmit={handleSubmit} className={AUTH_FORM_CLASS}>
         <AuthTextField
           name="email"
           label={dictionary.email}
@@ -91,7 +107,7 @@ export function LoginForm({ locale, dictionary }: LoginFormProps) {
             {dictionary.forgotPassword}
           </AppLink>
         </div>
-        <button disabled={isPending} className={AUTH_SUBMIT_CLASS}>
+        <button type="submit" disabled={isPending} className={AUTH_SUBMIT_CLASS}>
           {isPending ? dictionary.submittingLogin : dictionary.submitLogin}
         </button>
       </form>

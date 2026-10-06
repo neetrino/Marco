@@ -12,7 +12,14 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 
 export type AuthActionState = { error?: string };
 
-function resolveSafeNextPath(locale: Locale, raw: FormDataEntryValue | null): string {
+export type LoginActionInput = {
+  locale: string;
+  email: string;
+  password: string;
+  next?: string | null;
+};
+
+function resolveSafeNextPath(locale: Locale, raw: string | null | undefined): string {
   const homePath = `/${locale}`;
 
   if (typeof raw !== "string" || !raw.startsWith("/") || raw.startsWith("//")) {
@@ -30,13 +37,12 @@ function resolveSafeNextPath(locale: Locale, raw: FormDataEntryValue | null): st
   return raw;
 }
 
-export async function loginAction(
-  localeInput: string,
-  _previousState: AuthActionState,
-  formData: FormData,
-): Promise<AuthActionState> {
-  const parsed = loginSchema.safeParse(Object.fromEntries(formData));
-  const locale: Locale = isLocale(localeInput) ? localeInput : defaultLocale;
+export async function loginAction(input: LoginActionInput): Promise<AuthActionState> {
+  const locale: Locale = isLocale(input.locale) ? input.locale : defaultLocale;
+  const parsed = loginSchema.safeParse({
+    email: input.email,
+    password: input.password,
+  });
 
   if (!parsed.success) {
     return { error: "Invalid email or password." };
@@ -60,5 +66,5 @@ export async function loginAction(
     .set({ lastLoginAt: new Date(), updatedAt: new Date() })
     .where(eq(users.id, user.id));
   await createSession(user.id);
-  redirect(resolveSafeNextPath(locale, formData.get("next")));
+  redirect(resolveSafeNextPath(locale, input.next));
 }
