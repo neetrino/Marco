@@ -79,6 +79,8 @@ function buildImageRemotePatterns(): NonNullable<
 const SERVER_MUTATION_BODY_SIZE_LIMIT = "50mb";
 
 const nextConfig: NextConfig = {
+  // Keep Next from rewriting AGENTS.md on every `next dev` start.
+  agentRules: false,
   turbopack: {
     root: projectRoot,
   },
