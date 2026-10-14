@@ -1,9 +1,14 @@
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 
 import { FooterPaymentMarks } from "@/components/layout/FooterPaymentMarks";
 import { FooterSocialTiles } from "@/components/layout/FooterSocialTiles";
 import { AppLink } from "@/components/ui/AppLink";
+import {
+  buildContactLocations,
+  phoneToTelHref,
+  type ContactLocation,
+} from "@/features/contact/content/contact-locations";
 import {
   FOOTER_BRAND_COLUMN_GAP_CLASS,
   FOOTER_BRAND_DESCRIPTION_OVERLAP_CLASS,
@@ -73,25 +78,25 @@ function FooterNavColumn({
   );
 }
 
-function FooterContactsColumn({ dictionary }: { dictionary: Dictionary }) {
-  const footer = dictionary.footer;
-
+function FooterLocationContact({ location }: { location: ContactLocation }) {
   return (
-    <div
-      className={`flex h-full w-full max-w-full flex-col gap-2 ${FOOTER_TABLET_COLUMN_CENTER_CLASS}`}
-    >
-      <p className={FOOTER_HEADING_CLASS}>{footer.contacts}</p>
-      <div className={`flex items-start gap-2 ${FOOTER_CONTACT_ROW_CENTER_CLASS}`}>
+    <details className="group">
+      <summary
+        className={`flex cursor-pointer list-none items-start gap-2 ${FOOTER_CONTACT_ROW_CENTER_CLASS} [&::-webkit-details-marker]:hidden`}
+      >
         <MapPin
           className="mt-0 h-[18px] w-[18px] shrink-0 -translate-x-px translate-y-[3px] self-start text-marco-slate"
           strokeWidth={2}
           aria-hidden
         />
-        <p className={`${FOOTER_LINK_CLASS} leading-snug whitespace-pre-line`}>
-          {dictionary.contact.storeAddress}
-        </p>
-      </div>
-      <div className={`flex items-start gap-2 ${FOOTER_CONTACT_ROW_CENTER_CLASS}`}>
+        <span className={`${FOOTER_LINK_CLASS} leading-snug`}>{location.address}</span>
+        <ChevronDown
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-marco-slate transition-transform group-open:rotate-180"
+          strokeWidth={2.25}
+          aria-hidden
+        />
+      </summary>
+      <div className={`mt-1 flex items-start gap-2 ${FOOTER_CONTACT_ROW_CENTER_CLASS}`}>
         <Image
           src={FOOTER_CONTACT_PHONE_ICON_SRC}
           alt=""
@@ -101,10 +106,10 @@ function FooterContactsColumn({ dictionary }: { dictionary: Dictionary }) {
           aria-hidden
         />
         <div className="flex flex-col gap-0.5">
-          {footer.phones.map((phone) => (
+          {location.phones.map((phone) => (
             <a
               key={phone}
-              href={`tel:${phone.replace(/\s/g, "")}`}
+              href={phoneToTelHref(phone)}
               className={`${FOOTER_LINK_CLASS} hover:underline`}
             >
               {phone}
@@ -112,6 +117,22 @@ function FooterContactsColumn({ dictionary }: { dictionary: Dictionary }) {
           ))}
         </div>
       </div>
+    </details>
+  );
+}
+
+function FooterContactsColumn({ dictionary }: { dictionary: Dictionary }) {
+  const footer = dictionary.footer;
+  const locations = buildContactLocations(dictionary.contact.locations);
+
+  return (
+    <div
+      className={`flex h-full w-full max-w-full flex-col gap-2 ${FOOTER_TABLET_COLUMN_CENTER_CLASS}`}
+    >
+      <p className={FOOTER_HEADING_CLASS}>{footer.contacts}</p>
+      {locations.map((location) => (
+        <FooterLocationContact key={location.id} location={location} />
+      ))}
       <div className={`flex items-start gap-2 ${FOOTER_CONTACT_ROW_CENTER_CLASS}`}>
         <Image
           src={FOOTER_CONTACT_MAIL_ICON_SRC}
