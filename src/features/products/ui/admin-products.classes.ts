@@ -62,7 +62,7 @@ export const ADMIN_PRODUCTS_PAGINATION =
   "border-t border-gray-200 bg-gray-50/60 px-4 py-4 sm:px-6";
 
 export const ADMIN_PRODUCTS_PAGE_BUTTON =
-  "min-h-10 min-w-10 rounded-lg border text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1";
+  "inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border px-2 text-sm font-semibold tabular-nums transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1";
 
 export const ADMIN_PRODUCTS_PAGE_CURRENT =
   "border-amber-500 bg-amber-500 text-white shadow-sm";
