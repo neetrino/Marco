@@ -1,5 +1,6 @@
 import "server-only";
 
+import { paymentMethodLabel } from "@/features/orders/domain/payment-method-label";
 import { mediaPublicUrl } from "@/lib/media/public-url";
 import { getStoreIdentity } from "@/features/settings/application/queries";
 import {
@@ -55,20 +56,6 @@ function formatAddressLine(
   ].filter((part): part is string => Boolean(part && part.trim()));
 
   return parts.join(", ");
-}
-
-function paymentMethodLabel(method: string): string {
-  const normalized = method.toUpperCase();
-  if (normalized === "COD" || normalized === "CASH") {
-    return "Cash";
-  }
-  if (normalized === "IDRAM") {
-    return "Idram";
-  }
-  if (normalized === "ARCA") {
-    return "ArCa";
-  }
-  return method;
 }
 
 /** Maps a loaded order into a serializable admin drawer view. */

@@ -158,6 +158,7 @@
     "columnStatus": "Статус",
     "columnPayment": "Оплата",
     "columnTotal": "Итого",
+    "columnMethod": "Оплачено",
     "columnPlaced": "Дата",
     "empty": "Нет заказов по этим фильтрам.",
     "selectedOnPage": "На этой странице выбрано: {count}",

@@ -57,6 +57,11 @@ export function OrderDetailsDrawerTotals({
             {formatOrderDrawerMoney(detail.totalAmount, detail.baseCurrency)}
           </span>
         </div>
+
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-gray-600">Paid with</span>
+          <span className="font-medium text-gray-900">{detail.paymentMethod}</span>
+        </div>
       </div>
     </div>
   );

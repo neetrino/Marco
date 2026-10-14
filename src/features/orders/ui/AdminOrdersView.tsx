@@ -18,6 +18,7 @@ type AdminOrdersViewOrder = {
   baseCurrency: string;
   placedAt: string | Date;
   isArchived: boolean;
+  paymentMethod: string | null;
 };
 
 type AdminOrdersViewProps = {

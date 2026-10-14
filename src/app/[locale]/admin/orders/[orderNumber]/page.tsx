@@ -26,6 +26,7 @@ import {
   formatAdminMessage,
   getAdminCopy,
 } from "@/features/admin/ui/get-admin-copy";
+import { paymentMethodLabel } from "@/features/orders/domain/payment-method-label";
 import { getAdminOrderByNumber } from "@/features/orders/application/queries";
 import { isLocale } from "@/lib/i18n/config";
 
@@ -50,7 +51,7 @@ export default async function AdminOrderDetailPage({
     notFound();
   }
 
-  const { order, items, events } = detail;
+  const { order, items, events, payments } = detail;
   const address = order.shippingAddress;
   const copy = getAdminCopy(locale).orders;
   const common = getAdminCopy(locale).common;
@@ -133,6 +134,9 @@ export default async function AdminOrderDetailPage({
             {formatAdminMessage(copy.detailTotal, {
               amount: formatMoney(order.totalAmount, order.baseCurrency),
             })}
+          </p>
+          <p className="mt-2 text-sm text-gray-700">
+            {copy.columnMethod}: {paymentMethodLabel(payments[0]?.method)}
           </p>
           <p className="mt-2 text-sm text-gray-500">
             {formatAdminMessage(copy.placedAt, {
