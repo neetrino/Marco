@@ -25,6 +25,7 @@ import {
 } from "@/db/schema";
 import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { AdminOrdersFilter } from "@/features/orders/schemas/change-status";
+import { latestPaymentMethodSql } from "@/features/orders/application/latest-payment-method-sql";
 import { getStoreRevenue } from "@/features/settings/application/queries";
 
 const PAGE_SIZE = 20;
@@ -41,6 +42,7 @@ export type AdminOrderListItem = {
   placedAt: Date;
   isArchived: boolean;
   itemsCount: number;
+  paymentMethod: string | null;
 };
 
 export type AdminOrderDetail = {
@@ -119,11 +121,12 @@ export async function listAdminOrders(
             (
               select sum(${orderItems.quantity})
               from ${orderItems}
-              where ${orderItems.orderId} = ${orders.id}
+              where ${orderItems.orderId} = orders.id
             ),
             0
           )
         `.mapWith(Number),
+        paymentMethod: latestPaymentMethodSql(),
       })
       .from(orders)
       .where(where)
@@ -172,11 +175,12 @@ export async function listCustomerOrders(
             (
               select sum(${orderItems.quantity})
               from ${orderItems}
-              where ${orderItems.orderId} = ${orders.id}
+              where ${orderItems.orderId} = orders.id
             ),
             0
           )
         `.mapWith(Number),
+        paymentMethod: latestPaymentMethodSql(),
       })
       .from(orders)
       .where(where)
@@ -345,11 +349,12 @@ export async function getAdminDashboardMetrics(input: {
             (
               select sum(${orderItems.quantity})
               from ${orderItems}
-              where ${orderItems.orderId} = ${orders.id}
+              where ${orderItems.orderId} = orders.id
             ),
             0
           )
         `.mapWith(Number),
+        paymentMethod: latestPaymentMethodSql(),
       })
       .from(orders)
       .where(eq(orders.isArchived, false))

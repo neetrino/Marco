@@ -158,6 +158,7 @@
     "columnStatus": "Կարգավիճակ",
     "columnPayment": "Վճարում",
     "columnTotal": "Ընդամենը",
+    "columnMethod": "Վճարված է",
     "columnPlaced": "Ամսաթիվ",
     "empty": "Այս ֆիլտրերով պատվերներ չկան։",
     "selectedOnPage": "Այս էջում ընտրված է {count}",

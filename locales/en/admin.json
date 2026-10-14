@@ -158,6 +158,7 @@
     "columnStatus": "Status",
     "columnPayment": "Payment",
     "columnTotal": "Total",
+    "columnMethod": "Paid with",
     "columnPlaced": "Placed",
     "empty": "No orders match these filters.",
     "selectedOnPage": "{count} selected on this page",

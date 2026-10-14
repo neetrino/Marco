@@ -30,6 +30,7 @@ import {
   getAdminCopy,
 } from "@/features/admin/ui/get-admin-copy";
 import { bulkArchiveOrdersAction } from "@/features/orders/application/bulk-archive-orders";
+import { paymentMethodLabel } from "@/features/orders/domain/payment-method-label";
 import { AdminInlineStatusSelect } from "@/features/orders/ui/AdminInlineStatusSelect";
 
 type BulkOrderRow = {
@@ -43,6 +44,7 @@ type BulkOrderRow = {
   baseCurrency: string;
   placedAt: string | Date;
   isArchived: boolean;
+  paymentMethod: string | null;
 };
 
 type BulkChangeOrderStatusFormProps = {
@@ -169,6 +171,7 @@ export function BulkChangeOrderStatusForm({
                 <th className={ADMIN_TABLE_TH_METRIC}>{copy.columnStatus}</th>
                 <th className={ADMIN_TABLE_TH_METRIC}>{copy.columnPayment}</th>
                 <th className={ADMIN_TABLE_TH_METRIC}>{copy.columnTotal}</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>{copy.columnMethod}</th>
                 <th className={ADMIN_TABLE_TH}>{copy.columnPlaced}</th>
               </tr>
             </thead>
@@ -250,6 +253,9 @@ export function BulkChangeOrderStatusForm({
                     <span className="font-medium text-gray-900">
                       {formatMoney(order.totalAmount, order.baseCurrency)}
                     </span>
+                  </td>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
+                    {paymentMethodLabel(order.paymentMethod)}
                   </td>
                   <td className={ADMIN_TABLE_TD}>
                     <span className="text-xs text-gray-500">
