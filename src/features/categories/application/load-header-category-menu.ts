@@ -19,7 +19,10 @@ import {
   buildCategoryTree,
   type CategoryTreeNode,
 } from "@/features/categories/domain/category-tree";
-import type { HeaderCategoryNode } from "@/features/categories/domain/header-category-menu";
+import {
+  omitCategoriesWithoutProducts,
+  type HeaderCategoryNode,
+} from "@/features/categories/domain/header-category-menu";
 import {
   CACHE_TAGS,
   PUBLIC_CACHE_REVALIDATE_SECONDS,
@@ -162,10 +165,11 @@ async function loadHeaderCategoryMenu(
   ]);
 
   const tree: CategoryTreeNode<CategoryRow>[] = buildCategoryTree(mapped);
-  return buildCategoryTreeWithDistinctProductCounts(
+  const menu = buildCategoryTreeWithDistinctProductCounts(
     tree,
     groupProductIdsByCategory(linkRows),
   ).map((node) => toMenuNode(node, media.images, media.banners, drawerTitles));
+  return omitCategoriesWithoutProducts(menu);
 }
 
 /** Published category tree for the header mega menu. */
@@ -174,7 +178,7 @@ export async function getHeaderCategoryMenu(
 ): Promise<HeaderCategoryNode[]> {
   return unstable_cache(
     async () => loadHeaderCategoryMenu(locale),
-    ["header-category-menu-v3", locale],
+    ["header-category-menu-v4", locale],
     {
       tags: [CACHE_TAGS.products],
       revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS,
