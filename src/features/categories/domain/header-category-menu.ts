@@ -18,6 +18,24 @@ export type HeaderCategoryGroup = {
 /** Collapsed descendant list length before “see all”. */
 export const HEADER_CATEGORY_DESCENDANT_PREVIEW = 10;
 
+/**
+ * Drops categories with no active products.
+ * `count` already includes descendants, so an empty node has an empty subtree.
+ */
+export function omitCategoriesWithoutProducts(
+  nodes: readonly HeaderCategoryNode[],
+): HeaderCategoryNode[] {
+  const visible: HeaderCategoryNode[] = [];
+  for (const node of nodes) {
+    if (node.count <= 0) continue;
+    visible.push({
+      ...node,
+      children: omitCategoriesWithoutProducts(node.children),
+    });
+  }
+  return visible;
+}
+
 /** Groups a root’s direct children for the mega-menu content column. */
 export function headerCategoryGroups(
   root: HeaderCategoryNode,

@@ -12,6 +12,7 @@ import {
   removeCategoryBannerImage,
   removeCategoryImage,
 } from "@/features/categories/application/persist-category-media";
+import { categoryIdSchema } from "@/features/categories/domain/category-id";
 import { isInvalidCategoryParent } from "@/features/categories/domain/category-tree";
 import { requireAdmin } from "@/lib/auth/policies";
 import { invalidateProductsCache } from "@/lib/cache/invalidate-public";
@@ -28,7 +29,7 @@ const localeCopySchema = z.object({
 const createCategorySchema = z.object({
   title: z.string().trim().min(1).max(120),
   slug: z.string().trim().min(1).max(120),
-  parentId: z.string().uuid().nullable(),
+  parentId: categoryIdSchema.nullable(),
   status: z.enum(["ACTIVE", "ARCHIVED"]),
 });
 
@@ -40,7 +41,7 @@ const drawerFieldsSchema = z.object({
       ru: localeCopySchema.optional(),
     })
     .refine((value) => Boolean(value.hy ?? value.en ?? value.ru)),
-  parentId: z.string().uuid().nullable(),
+  parentId: categoryIdSchema.nullable(),
   status: z.enum(["ACTIVE", "ARCHIVED"]),
 });
 
@@ -414,7 +415,7 @@ export async function deleteCategoryAction(
 }
 
 const reorderCategoriesSchema = z.object({
-  orderedIds: z.array(z.string().uuid()).min(1),
+  orderedIds: z.array(categoryIdSchema).min(1),
 });
 
 /** Persists admin category table order via sortOrder (1-based). */

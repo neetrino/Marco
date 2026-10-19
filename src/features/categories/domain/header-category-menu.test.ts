@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   HEADER_CATEGORY_DESCENDANT_PREVIEW,
   headerCategoryGroups,
+  omitCategoriesWithoutProducts,
   visibleCategoryDescendants,
   type HeaderCategoryNode,
 } from "@/features/categories/domain/header-category-menu";
@@ -10,12 +11,13 @@ import {
 function node(
   id: string,
   children: HeaderCategoryNode[] = [],
+  count = 1,
 ): HeaderCategoryNode {
   return {
     id,
     slug: id,
     title: id,
-    count: 0,
+    count,
     imageUrl: null,
     bannerImageUrl: null,
     drawerTitle: null,
@@ -32,6 +34,21 @@ describe("header category menu", () => {
     expect(groups.map((group) => group.parent.id)).toEqual(["sofas", "tables"]);
     expect(groups[0]?.parent.children).toEqual([]);
     expect(groups[0]?.children.map((child) => child.id)).toEqual(["corner"]);
+  });
+
+  it("omits categories that no product uses, including nested children", () => {
+    const bedroom = node("bedroom", [node("beds", [], 0)], 0);
+    const sofas = node("sofas", [node("unused-corner", [], 0), node("corner")]);
+    const menu = omitCategoriesWithoutProducts([
+      node("furniture", [sofas, bedroom]),
+      node("empty-root", [], 0),
+    ]);
+
+    expect(menu.map((item) => item.id)).toEqual(["furniture"]);
+    expect(menu[0]?.children.map((child) => child.id)).toEqual(["sofas"]);
+    expect(menu[0]?.children[0]?.children.map((child) => child.id)).toEqual([
+      "corner",
+    ]);
   });
 
   it("caps collapsed descendants at the preview count", () => {
